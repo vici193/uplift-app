@@ -7092,6 +7092,22 @@ function AdminPanel({ en, showToast }) {
         const [helpAppId, setHelpAppId] = useState(null)
         const [loggedIn, setLoggedIn] = useState(!!sessionStorage.getItem("uplift_session"))
         const [restoringSession, setRestoringSession] = useState(!!sessionStorage.getItem("uplift_session"))
+        const logoTapCount = useRef(0)
+        const logoTapTimer = useRef(null)
+
+        function handleLogoTap() {
+            logoTapCount.current += 1
+            if (logoTapTimer.current) clearTimeout(logoTapTimer.current)
+            logoTapTimer.current = setTimeout(() => { logoTapCount.current = 0 }, 5000)
+            if (logoTapCount.current >= 5) {
+                logoTapCount.current = 0
+                navigate("admin")
+                return true
+            }
+            showToast(`${logoTapCount.current}/5`)
+            return false
+        }
+
         const [driver, setDriver] = useState(null)
         const [driverId, setDriverId] = useState(null)
         const [apps, setApps] = useState([])
@@ -7484,15 +7500,9 @@ function AdminPanel({ en, showToast }) {
                 <div className={`app ${loggedIn ? 'logged-in-layout' : ''}`}>
                     <Toast msg={toast}/>
                     <NotifModal notif={currentModal} onClose={closeModal} onAction={handleModalAction}/>
-                    {/* ADD THE FLOATING BUTTON HERE */}
-                    {loggedIn && (
-                        <button className="admin-float-btn" onClick={() => navigate("admin")}>
-                            <span>⚙️</span> {en ? "Admin" : "Admin"}
-                        </button>
-                    )}
 
                     <div className="topbar">
-                        <div className="logo" onClick={() => setPage(loggedIn ? "dashboard" : "signin")}>UPLIFT <span>EO 110</span>
+                        <div className="logo" onClick={() => { if (!handleLogoTap()) setPage(loggedIn ? "dashboard" : "signin") }}>UPLIFT <span>EO 110</span>
                         </div>
                         <div className="topbar-right">
 
