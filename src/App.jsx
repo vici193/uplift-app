@@ -486,12 +486,25 @@ body.lock-scroll .scroll.no-nav {
   touch-action: pan-y;
 }
 
-/* Compact tutorial guide boxes on small screens so Skip/Next never get pushed off-screen */
+/* Pin every tutorial guide box to the bottom of the screen — always visible
+   regardless of scroll position or how long the highlighted content is */
+.guide-box {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 16px !important;
+  top: auto !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 32px) !important;
+  max-width: 440px !important;
+  margin: 0 !important;
+  z-index: 1001 !important;
+  max-height: 40vh;
+  overflow-y: auto;
+}
 @media (max-width: 480px) {
   .guide-box {
     padding: 10px !important;
-    margin-top: 8px !important;
-    margin-bottom: 8px !important;
+    bottom: 10px !important;
   }
   .guide-box > div:first-child {
     font-size: 10px !important;
