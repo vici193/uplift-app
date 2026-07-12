@@ -7136,8 +7136,11 @@ export default function App() {
         logoTapTimer.current = setTimeout(() => { logoTapCount.current = 0 }, 5000)
         if (logoTapCount.current >= 5) {
             logoTapCount.current = 0
-            if (loggedIn) navigate("admin")
+            navigate("admin")
+            return true
         }
+        showToast(`${logoTapCount.current}/5`)
+        return false
     }
 
     const [driver, setDriver] = useState(null)
@@ -7534,7 +7537,7 @@ export default function App() {
                 <NotifModal notif={currentModal} onClose={closeModal} onAction={handleModalAction}/>
 
                 <div className="topbar">
-                    <div className="logo" onClick={() => { handleLogoTap(); setPage(loggedIn ? "dashboard" : "signin") }}>UPLIFT <span>EO 110</span>
+                    <div className="logo" onClick={() => { if (!handleLogoTap()) setPage(loggedIn ? "dashboard" : "signin") }}>UPLIFT <span>EO 110</span>
                     </div>
                     <div className="topbar-right">
 
