@@ -481,10 +481,32 @@ body.lock-scroll .app,
 body.lock-scroll .main-content,
 body.lock-scroll .scroll,
 body.lock-scroll .scroll.no-nav {
-  overflow: hidden !important;
-  touch-action: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  touch-action: pan-y;
 }
 
+/* Compact tutorial guide boxes on small screens so Skip/Next never get pushed off-screen */
+@media (max-width: 480px) {
+  .guide-box {
+    padding: 10px !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+  }
+  .guide-box > div:first-child {
+    font-size: 10px !important;
+    margin-bottom: 4px !important;
+  }
+  .guide-box > div:nth-child(2) {
+    font-size: 11.5px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 8px !important;
+  }
+  .guide-box .btn.sm {
+    padding: 5px 10px !important;
+    font-size: 10.5px !important;
+  }
+}
 `
 
 
@@ -662,7 +684,7 @@ function SignIn({ en, onNav, onLogin, showTutorial, setShowTutorial }) {
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
@@ -854,7 +876,7 @@ function ChangeNumber({ en, onNav, showTutorial, setShowTutorial }) {
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)"
@@ -1170,7 +1192,7 @@ function ForgotPassword({ en, onNav, showTutorial, setShowTutorial }) {
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)"
@@ -1663,7 +1685,7 @@ function SignUp({ en, onNav, onLogin, showTutorial, setShowTutorial }) {
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
@@ -1940,83 +1962,83 @@ function SignUp({ en, onNav, onLogin, showTutorial, setShowTutorial }) {
                         </div>
 
                         <div className="fg" ref={el => fieldRefs.current.last_name = el}>
-                        <label className="fl">{en ? "Last Name *" : "Apelyido *"}</label>
-                        <input className="fi" style={errStyle("last_name")} placeholder="e.g. Santos" value={form.last_name}
-                               onChange={e => { set("last_name", e.target.value); clearFieldError("last_name") }}
-                               onBlur={() => onBlurProperCase("last_name")} />
-                        <ErrMsg name="last_name" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.first_name = el}>
-                        <label className="fl">{en ? "First Name *" : "Pangalan *"}</label>
-                        <input className="fi" style={errStyle("first_name")} placeholder="e.g. Juan" value={form.first_name}
-                               onChange={e => { set("first_name", e.target.value); clearFieldError("first_name") }}
-                               onBlur={() => onBlurProperCase("first_name")} />
-                        <ErrMsg name="first_name" />
-                    </div>
-
-                    <div className="fg" ref={el => fieldRefs.current.middle_name = el}>
-                        <label className="fl">{en ? "Middle Name *" : "Gitnang Pangalan *"}</label>
-                        <input className="fi" placeholder="e.g. Dela Cruz" value={noMiddle ? "" : form.middle_name}
-                               onChange={e => { set("middle_name", e.target.value); clearFieldError("middle_name") }}
-                               onBlur={() => onBlurProperCase("middle_name")}
-                               disabled={noMiddle} style={{ ...errStyle("middle_name"), opacity: noMiddle ? 0.4 : 1 }} />
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
-                            <input type="checkbox" id="nomiddle" checked={noMiddle} onChange={e => { setNoMiddle(e.target.checked); clearFieldError("middle_name") }} style={{ cursor: "pointer" }} />
-                            <label htmlFor="nomiddle" style={{ fontSize: 12, color: "var(--slate)", cursor: "pointer" }}>{en ? "I have no middle name" : "Wala akong gitnang pangalan"}</label>
+                            <label className="fl">{en ? "Last Name *" : "Apelyido *"}</label>
+                            <input className="fi" style={errStyle("last_name")} placeholder="e.g. Santos" value={form.last_name}
+                                   onChange={e => { set("last_name", e.target.value); clearFieldError("last_name") }}
+                                   onBlur={() => onBlurProperCase("last_name")} />
+                            <ErrMsg name="last_name" />
                         </div>
-                        <ErrMsg name="middle_name" />
-                    </div>
-
-                    <div className="fg" ref={el => fieldRefs.current.extension_name = el}>
-                        <label className="fl">{en ? "Extension Name *" : "Extension Name *"} <span style={{fontWeight:400,color:"var(--slate)"}}>(Jr, Sr, III)</span></label>
-                        <input className="fi" placeholder="e.g. Jr" value={noExtension ? "" : form.extension_name}
-                               onChange={e => { set("extension_name", e.target.value); clearFieldError("extension_name") }}
-                               onBlur={() => onBlurProperCase("extension_name")}
-                               disabled={noExtension} style={{ ...errStyle("extension_name"), opacity: noExtension ? 0.4 : 1 }} />
-                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
-                            <input type="checkbox" id="noext" checked={noExtension} onChange={e => { setNoExtension(e.target.checked); clearFieldError("extension_name") }} style={{ cursor: "pointer" }} />
-                            <label htmlFor="noext" style={{ fontSize: 12, color: "var(--slate)", cursor: "pointer" }}>{en ? "I have no extension name" : "Wala akong extension name"}</label>
+                        <div className="fg" ref={el => fieldRefs.current.first_name = el}>
+                            <label className="fl">{en ? "First Name *" : "Pangalan *"}</label>
+                            <input className="fi" style={errStyle("first_name")} placeholder="e.g. Juan" value={form.first_name}
+                                   onChange={e => { set("first_name", e.target.value); clearFieldError("first_name") }}
+                                   onBlur={() => onBlurProperCase("first_name")} />
+                            <ErrMsg name="first_name" />
                         </div>
-                        <ErrMsg name="extension_name" />
-                    </div>
 
-                    <div className="fg" ref={el => fieldRefs.current.sex = el}>
-                        <label className="fl">{en ? "Sex *" : "Kasarian *"}</label>
-                        <select className="fsel" style={errStyle("sex")} value={form.sex} onChange={e => { set("sex", e.target.value); clearFieldError("sex") }}>
-                            <option value="">{en ? "Select..." : "Pumili..."}</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Others</option>
-                        </select>
-                        <ErrMsg name="sex" />
-                    </div>
+                        <div className="fg" ref={el => fieldRefs.current.middle_name = el}>
+                            <label className="fl">{en ? "Middle Name *" : "Gitnang Pangalan *"}</label>
+                            <input className="fi" placeholder="e.g. Dela Cruz" value={noMiddle ? "" : form.middle_name}
+                                   onChange={e => { set("middle_name", e.target.value); clearFieldError("middle_name") }}
+                                   onBlur={() => onBlurProperCase("middle_name")}
+                                   disabled={noMiddle} style={{ ...errStyle("middle_name"), opacity: noMiddle ? 0.4 : 1 }} />
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+                                <input type="checkbox" id="nomiddle" checked={noMiddle} onChange={e => { setNoMiddle(e.target.checked); clearFieldError("middle_name") }} style={{ cursor: "pointer" }} />
+                                <label htmlFor="nomiddle" style={{ fontSize: 12, color: "var(--slate)", cursor: "pointer" }}>{en ? "I have no middle name" : "Wala akong gitnang pangalan"}</label>
+                            </div>
+                            <ErrMsg name="middle_name" />
+                        </div>
 
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 10, marginTop: 16 }}>
-                        {en ? "Date of Birth *" : "Petsa ng Kapanganakan *"}
-                    </div>
-                    <div className="two-col">
-                        <div className="fg" ref={el => fieldRefs.current.birth_month = el}>
-                            <label className="fl">{en ? "Month" : "Buwan"}</label>
-                            <select className="fsel" style={errStyle("birth_month")} value={form.birth_month} onChange={e => { set("birth_month", e.target.value); clearFieldError("birth_month") }}>
+                        <div className="fg" ref={el => fieldRefs.current.extension_name = el}>
+                            <label className="fl">{en ? "Extension Name *" : "Extension Name *"} <span style={{fontWeight:400,color:"var(--slate)"}}>(Jr, Sr, III)</span></label>
+                            <input className="fi" placeholder="e.g. Jr" value={noExtension ? "" : form.extension_name}
+                                   onChange={e => { set("extension_name", e.target.value); clearFieldError("extension_name") }}
+                                   onBlur={() => onBlurProperCase("extension_name")}
+                                   disabled={noExtension} style={{ ...errStyle("extension_name"), opacity: noExtension ? 0.4 : 1 }} />
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+                                <input type="checkbox" id="noext" checked={noExtension} onChange={e => { setNoExtension(e.target.checked); clearFieldError("extension_name") }} style={{ cursor: "pointer" }} />
+                                <label htmlFor="noext" style={{ fontSize: 12, color: "var(--slate)", cursor: "pointer" }}>{en ? "I have no extension name" : "Wala akong extension name"}</label>
+                            </div>
+                            <ErrMsg name="extension_name" />
+                        </div>
+
+                        <div className="fg" ref={el => fieldRefs.current.sex = el}>
+                            <label className="fl">{en ? "Sex *" : "Kasarian *"}</label>
+                            <select className="fsel" style={errStyle("sex")} value={form.sex} onChange={e => { set("sex", e.target.value); clearFieldError("sex") }}>
                                 <option value="">{en ? "Select..." : "Pumili..."}</option>
-                                {months.map(m => <option key={m}>{m}</option>)}
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Others</option>
                             </select>
-                            <ErrMsg name="birth_month" />
+                            <ErrMsg name="sex" />
                         </div>
-                        <div className="fg" ref={el => fieldRefs.current.birth_day = el}>
-                            <label className="fl">{en ? "Day" : "Araw"}</label>
-                            <select className="fsel" style={errStyle("birth_day")} value={form.birth_day} onChange={e => { set("birth_day", e.target.value); clearFieldError("birth_day") }}>
-                                <option value="">{en ? "Select..." : "Pumili..."}</option>
-                                {days.map(d => <option key={d}>{d}</option>)}
-                            </select>
-                            <ErrMsg name="birth_day" />
+
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 10, marginTop: 16 }}>
+                            {en ? "Date of Birth *" : "Petsa ng Kapanganakan *"}
                         </div>
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.birth_year = el}>
-                        <label className="fl">{en ? "Year (YYYY)" : "Taon (YYYY)"}</label>
-                        <input className="fi" style={errStyle("birth_year")} placeholder="e.g. 1985" value={form.birth_year} onChange={e => { set("birth_year", e.target.value); calcAge(e.target.value); clearFieldError("birth_year") }} maxLength={4} />
-                        <ErrMsg name="birth_year" />
-                    </div>
+                        <div className="two-col">
+                            <div className="fg" ref={el => fieldRefs.current.birth_month = el}>
+                                <label className="fl">{en ? "Month" : "Buwan"}</label>
+                                <select className="fsel" style={errStyle("birth_month")} value={form.birth_month} onChange={e => { set("birth_month", e.target.value); clearFieldError("birth_month") }}>
+                                    <option value="">{en ? "Select..." : "Pumili..."}</option>
+                                    {months.map(m => <option key={m}>{m}</option>)}
+                                </select>
+                                <ErrMsg name="birth_month" />
+                            </div>
+                            <div className="fg" ref={el => fieldRefs.current.birth_day = el}>
+                                <label className="fl">{en ? "Day" : "Araw"}</label>
+                                <select className="fsel" style={errStyle("birth_day")} value={form.birth_day} onChange={e => { set("birth_day", e.target.value); clearFieldError("birth_day") }}>
+                                    <option value="">{en ? "Select..." : "Pumili..."}</option>
+                                    {days.map(d => <option key={d}>{d}</option>)}
+                                </select>
+                                <ErrMsg name="birth_day" />
+                            </div>
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.birth_year = el}>
+                            <label className="fl">{en ? "Year (YYYY)" : "Taon (YYYY)"}</label>
+                            <input className="fi" style={errStyle("birth_year")} placeholder="e.g. 1985" value={form.birth_year} onChange={e => { set("birth_year", e.target.value); calcAge(e.target.value); clearFieldError("birth_year") }} maxLength={4} />
+                            <ErrMsg name="birth_year" />
+                        </div>
                     </div>
                     <GuideBox stepIndex={0} />
 
@@ -2025,104 +2047,104 @@ function SignUp({ en, onNav, onLogin, showTutorial, setShowTutorial }) {
                             {en ? "Address *" : "Tirahan *"}
                         </div>
                         <div className="fg" ref={el => fieldRefs.current.region = el}>
-                        <label className="fl">Region *</label>
-                        <select className="fsel" style={errStyle("region")} value={form.region} onChange={e => {
-                            set("region", e.target.value); set("province", ""); set("city", ""); clearFieldError("region")
-                        }}>
-                            <option value="">{en ? "Select..." : "Pumili..."}</option>
-                            {PH_REGIONS.map(r => <option key={r}>{r}</option>)}
-                        </select>
-                        <ErrMsg name="region" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.province = el}>
-                        <label className="fl">Province *</label>
-                        <select className="fsel" style={errStyle("province")} value={form.province} disabled={!form.region} onChange={e => {
-                            set("province", e.target.value); set("city", ""); clearFieldError("province")
-                        }}>
-                            <option value="">{form.region ? (en ? "Select..." : "Pumili...") : (en ? "Select a region first" : "Pumili muna ng rehiyon")}</option>
-                            {provinceOptions.map(p => <option key={p}>{p}</option>)}
-                        </select>
-                        <ErrMsg name="province" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.city = el}>
-                        <label className="fl">{en ? "City / Municipality *" : "Lungsod / Munisipyo *"}</label>
-                        <select className="fsel" style={errStyle("city")} value={form.city} disabled={!form.province} onChange={e => {
-                            set("city", e.target.value); clearFieldError("city")
-                        }}>
-                            <option value="">{form.province ? (en ? "Select..." : "Pumili...") : (en ? "Select a province first" : "Pumili muna ng probinsya")}</option>
-                            {cityOptions.map(c => <option key={c}>{c}</option>)}
-                        </select>
-                        <ErrMsg name="city" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.barangay = el}>
-                        <label className="fl">Barangay *</label>
-                        <input className="fi" style={errStyle("barangay")} placeholder="e.g. Brgy. Poblacion" value={form.barangay}
-                               onChange={e => { set("barangay", e.target.value); clearFieldError("barangay") }}
-                               onBlur={() => onBlurProperCase("barangay")} />
-                        <ErrMsg name="barangay" />
-                    </div>
+                            <label className="fl">Region *</label>
+                            <select className="fsel" style={errStyle("region")} value={form.region} onChange={e => {
+                                set("region", e.target.value); set("province", ""); set("city", ""); clearFieldError("region")
+                            }}>
+                                <option value="">{en ? "Select..." : "Pumili..."}</option>
+                                {PH_REGIONS.map(r => <option key={r}>{r}</option>)}
+                            </select>
+                            <ErrMsg name="region" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.province = el}>
+                            <label className="fl">Province *</label>
+                            <select className="fsel" style={errStyle("province")} value={form.province} disabled={!form.region} onChange={e => {
+                                set("province", e.target.value); set("city", ""); clearFieldError("province")
+                            }}>
+                                <option value="">{form.region ? (en ? "Select..." : "Pumili...") : (en ? "Select a region first" : "Pumili muna ng rehiyon")}</option>
+                                {provinceOptions.map(p => <option key={p}>{p}</option>)}
+                            </select>
+                            <ErrMsg name="province" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.city = el}>
+                            <label className="fl">{en ? "City / Municipality *" : "Lungsod / Munisipyo *"}</label>
+                            <select className="fsel" style={errStyle("city")} value={form.city} disabled={!form.province} onChange={e => {
+                                set("city", e.target.value); clearFieldError("city")
+                            }}>
+                                <option value="">{form.province ? (en ? "Select..." : "Pumili...") : (en ? "Select a province first" : "Pumili muna ng probinsya")}</option>
+                                {cityOptions.map(c => <option key={c}>{c}</option>)}
+                            </select>
+                            <ErrMsg name="city" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.barangay = el}>
+                            <label className="fl">Barangay *</label>
+                            <input className="fi" style={errStyle("barangay")} placeholder="e.g. Brgy. Poblacion" value={form.barangay}
+                                   onChange={e => { set("barangay", e.target.value); clearFieldError("barangay") }}
+                                   onBlur={() => onBlurProperCase("barangay")} />
+                            <ErrMsg name="barangay" />
+                        </div>
                     </div>
                     <GuideBox stepIndex={1} />
 
                     <div id="tut-step-2" style={getHighlightStyle(2)}>
                         <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 10, marginTop: 16 }}>
                             {en ? "Vehicle and Franchise" : "Sasakyan at Pransisa"}
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.denomination = el}>
-                        <label className="fl">{en ? "Denomination (Vehicle Type) *" : "Uri ng Sasakyan *"}</label>
-                        <select className="fsel" style={errStyle("denomination")} value={form.denomination} onChange={e => { set("denomination", e.target.value); clearFieldError("denomination") }}>
-                            <option value="">{en ? "Select..." : "Pumili..."}</option>
-                            {denominations.map(d => <option key={d}>{d}</option>)}
-                        </select>
-                        <ErrMsg name="denomination" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.case_number = el}>
-                        <label className="fl">{en ? "Case Number *" : "Case Number *"} <span style={{fontWeight:400,color:"var(--slate)"}}>e.g. 2020-XXXX</span></label>
-                        <input className="fi" style={errStyle("case_number")} placeholder="2020-XXXX" value={form.case_number} onChange={e => { set("case_number", formatCaseNumber(e.target.value)); clearFieldError("case_number") }} />
-                        <ErrMsg name="case_number" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.operator_name = el}>
-                        <label className="fl">{en ? "Operator's Name *" : "Pangalan ng Operator *"}</label>
-                        <input className="fi" style={errStyle("operator_name")} placeholder={en ? "Transport entity or individual name" : "Pangalan ng transport entity o indibidwal"} value={form.operator_name}
-                               onChange={e => { set("operator_name", e.target.value); clearFieldError("operator_name") }}
-                               onBlur={() => onBlurProperCaseKeepAcronyms("operator_name")} />
-                        <ErrMsg name="operator_name" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.cooperative_name = el}>
-                        <label className="fl">{en ? "Cooperative Name *" : "Pangalan ng Kooperatiba *"}</label>
-                        <input className="fi" style={errStyle("cooperative_name")} placeholder={en ? "e.g. Quezon City TODA Inc." : "hal. Quezon City TODA Inc."} value={form.cooperative_name}
-                               onChange={e => { set("cooperative_name", e.target.value); clearFieldError("cooperative_name") }}
-                               onBlur={() => onBlurProperCaseKeepAcronyms("cooperative_name")} />
-                        <ErrMsg name="cooperative_name" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.plate_number = el}>
-                        <label className="fl">{en ? "Plate Number *" : "Plate Number *"}</label>
-                        <input className="fi" style={errStyle("plate_number")} placeholder="e.g. ABC 1234" value={form.plate_number}
-                               onChange={e => { set("plate_number", formatPlateNumber(e.target.value)); clearFieldError("plate_number") }} />
-                        <ErrMsg name="plate_number" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.chassis_number = el}>
-                        <label className="fl">{en ? "Chassis Number *" : "Chassis Number *"}</label>
-                        <input className="fi" style={errStyle("chassis_number")} placeholder="e.g. XXXXXXXXXX" value={form.chassis_number} onChange={e => { set("chassis_number", e.target.value); clearFieldError("chassis_number") }} />
-                        <ErrMsg name="chassis_number" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.license_number = el}>
-                        <label className="fl">{en ? "Driver's License Number *" : "Numero ng Driver's License *"}</label>
-                        <input className="fi" style={errStyle("license_number")} placeholder={licenseNumberPlaceholder(form.denomination)} value={form.license_number}
-                               onChange={e => { set("license_number", formatLicenseNumber(e.target.value)); clearFieldError("license_number") }} />
-                        <div className="fh">{en ? `Format: ${licenseNumberPlaceholder(form.denomination)}.` : `Format: ${licenseNumberPlaceholder(form.denomination)}.`} {form.denomination && dlCodeHint(form.denomination, en)}</div>
-                        <ErrMsg name="license_number" />
-                    </div>
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.denomination = el}>
+                            <label className="fl">{en ? "Denomination (Vehicle Type) *" : "Uri ng Sasakyan *"}</label>
+                            <select className="fsel" style={errStyle("denomination")} value={form.denomination} onChange={e => { set("denomination", e.target.value); clearFieldError("denomination") }}>
+                                <option value="">{en ? "Select..." : "Pumili..."}</option>
+                                {denominations.map(d => <option key={d}>{d}</option>)}
+                            </select>
+                            <ErrMsg name="denomination" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.case_number = el}>
+                            <label className="fl">{en ? "Case Number *" : "Case Number *"} <span style={{fontWeight:400,color:"var(--slate)"}}>e.g. 2020-XXXX</span></label>
+                            <input className="fi" style={errStyle("case_number")} placeholder="2020-XXXX" value={form.case_number} onChange={e => { set("case_number", formatCaseNumber(e.target.value)); clearFieldError("case_number") }} />
+                            <ErrMsg name="case_number" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.operator_name = el}>
+                            <label className="fl">{en ? "Operator's Name *" : "Pangalan ng Operator *"}</label>
+                            <input className="fi" style={errStyle("operator_name")} placeholder={en ? "Transport entity or individual name" : "Pangalan ng transport entity o indibidwal"} value={form.operator_name}
+                                   onChange={e => { set("operator_name", e.target.value); clearFieldError("operator_name") }}
+                                   onBlur={() => onBlurProperCaseKeepAcronyms("operator_name")} />
+                            <ErrMsg name="operator_name" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.cooperative_name = el}>
+                            <label className="fl">{en ? "Cooperative Name *" : "Pangalan ng Kooperatiba *"}</label>
+                            <input className="fi" style={errStyle("cooperative_name")} placeholder={en ? "e.g. Quezon City TODA Inc." : "hal. Quezon City TODA Inc."} value={form.cooperative_name}
+                                   onChange={e => { set("cooperative_name", e.target.value); clearFieldError("cooperative_name") }}
+                                   onBlur={() => onBlurProperCaseKeepAcronyms("cooperative_name")} />
+                            <ErrMsg name="cooperative_name" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.plate_number = el}>
+                            <label className="fl">{en ? "Plate Number *" : "Plate Number *"}</label>
+                            <input className="fi" style={errStyle("plate_number")} placeholder="e.g. ABC 1234" value={form.plate_number}
+                                   onChange={e => { set("plate_number", formatPlateNumber(e.target.value)); clearFieldError("plate_number") }} />
+                            <ErrMsg name="plate_number" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.chassis_number = el}>
+                            <label className="fl">{en ? "Chassis Number *" : "Chassis Number *"}</label>
+                            <input className="fi" style={errStyle("chassis_number")} placeholder="e.g. XXXXXXXXXX" value={form.chassis_number} onChange={e => { set("chassis_number", e.target.value); clearFieldError("chassis_number") }} />
+                            <ErrMsg name="chassis_number" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.license_number = el}>
+                            <label className="fl">{en ? "Driver's License Number *" : "Numero ng Driver's License *"}</label>
+                            <input className="fi" style={errStyle("license_number")} placeholder={licenseNumberPlaceholder(form.denomination)} value={form.license_number}
+                                   onChange={e => { set("license_number", formatLicenseNumber(e.target.value)); clearFieldError("license_number") }} />
+                            <div className="fh">{en ? `Format: ${licenseNumberPlaceholder(form.denomination)}.` : `Format: ${licenseNumberPlaceholder(form.denomination)}.`} {form.denomination && dlCodeHint(form.denomination, en)}</div>
+                            <ErrMsg name="license_number" />
+                        </div>
 
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 10, marginTop: 16 }}>
-                        {en ? "Contact" : "Kontak"}
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.mobile = el}>
-                        <label className="fl">{en ? "Mobile Number *" : "Numero ng Telepono *"}</label>
-                        <input className="fi" style={errStyle("mobile")} placeholder="09XX XXX XXXX" value={formatMobileDisplay(form.mobile)}
-                               onChange={e => { set("mobile", formatMobileDisplay(e.target.value)); clearFieldError("mobile") }} />
-                        <ErrMsg name="mobile" />
-                    </div>
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 10, marginTop: 16 }}>
+                            {en ? "Contact" : "Kontak"}
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.mobile = el}>
+                            <label className="fl">{en ? "Mobile Number *" : "Numero ng Telepono *"}</label>
+                            <input className="fi" style={errStyle("mobile")} placeholder="09XX XXX XXXX" value={formatMobileDisplay(form.mobile)}
+                                   onChange={e => { set("mobile", formatMobileDisplay(e.target.value)); clearFieldError("mobile") }} />
+                            <ErrMsg name="mobile" />
+                        </div>
                     </div>
                     <GuideBox stepIndex={2} />
 
@@ -2131,84 +2153,84 @@ function SignUp({ en, onNav, onLogin, showTutorial, setShowTutorial }) {
                             {en ? "Account Security" : "Seguridad ng Account"}
                         </div>
                         <div className="fg" ref={el => fieldRefs.current.password = el}>
-                        <label className="fl">{en ? "Password *" : "Password *"}</label>
-                        <div style={{ position: "relative" }}>
-                            <input className="fi" style={{ ...errStyle("password"), paddingRight: 56 }} type={showPassword ? "text" : "password"} placeholder={en ? "Create a password" : "Gumawa ng password"} value={form.password} onChange={e => { set("password", e.target.value); clearFieldError("password") }} />
-                            <span onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--navy)", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
+                            <label className="fl">{en ? "Password *" : "Password *"}</label>
+                            <div style={{ position: "relative" }}>
+                                <input className="fi" style={{ ...errStyle("password"), paddingRight: 56 }} type={showPassword ? "text" : "password"} placeholder={en ? "Create a password" : "Gumawa ng password"} value={form.password} onChange={e => { set("password", e.target.value); clearFieldError("password") }} />
+                                <span onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--navy)", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
                                 {showPassword ? (en ? "Hide" : "Itago") : (en ? "Show" : "Ipakita")}
                             </span>
+                            </div>
+                            <div className="fh">{en ? "At least 8 characters, with a number and a special character (e.g. ! @ # $ % ^ & * ( ) , . ? \" : { } | < > _ - + =). Cannot be your name or birth year." : "Hindi bababa sa 8 karakter, may numero at special character (hal. ! @ # $ % ^ & * ( ) , . ? \" : { } | < > _ - + =). Hindi puwedeng pangalan o taon ng kapanganakan."}</div>
+                            <ErrMsg name="password" />
                         </div>
-                        <div className="fh">{en ? "At least 8 characters, with a number and a special character (e.g. ! @ # $ % ^ & * ( ) , . ? \" : { } | < > _ - + =). Cannot be your name or birth year." : "Hindi bababa sa 8 karakter, may numero at special character (hal. ! @ # $ % ^ & * ( ) , . ? \" : { } | < > _ - + =). Hindi puwedeng pangalan o taon ng kapanganakan."}</div>
-                        <ErrMsg name="password" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.confirm_password = el}>
-                        <label className="fl">{en ? "Confirm Password *" : "Kumpirmahin ang Password *"}</label>
-                        <div style={{ position: "relative" }}>
-                            <input className="fi" style={{ ...errStyle("confirm_password"), paddingRight: 56 }} type={showConfirmPassword ? "text" : "password"} placeholder={en ? "Re-enter your password" : "Ulitin ang password"} value={form.confirm_password} onChange={e => { set("confirm_password", e.target.value); clearFieldError("confirm_password") }} />
-                            <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--navy)", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
+                        <div className="fg" ref={el => fieldRefs.current.confirm_password = el}>
+                            <label className="fl">{en ? "Confirm Password *" : "Kumpirmahin ang Password *"}</label>
+                            <div style={{ position: "relative" }}>
+                                <input className="fi" style={{ ...errStyle("confirm_password"), paddingRight: 56 }} type={showConfirmPassword ? "text" : "password"} placeholder={en ? "Re-enter your password" : "Ulitin ang password"} value={form.confirm_password} onChange={e => { set("confirm_password", e.target.value); clearFieldError("confirm_password") }} />
+                                <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: "var(--navy)", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
                                 {showConfirmPassword ? (en ? "Hide" : "Itago") : (en ? "Show" : "Ipakita")}
                             </span>
+                            </div>
+                            <ErrMsg name="confirm_password" />
                         </div>
-                        <ErrMsg name="confirm_password" />
-                    </div>
 
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 6, marginTop: 16 }}>
-                        {en ? "Account Recovery *" : "Pagbawi ng Account *"}
-                    </div>
-                    <p style={{ fontSize: 11, color: "var(--slate)", marginBottom: 10 }}>
-                        {en ? "Choose questions only you would know the answer to. In case SMS OTP doesn't arrive, these help you recover your account." : "Pumili ng mga tanong na ikaw lang ang nakakaalam ng sagot. Sakaling hindi dumating ang SMS OTP, makakatulong ang mga ito para mabawi ang account."}
-                    </p>
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: "var(--slate)", marginBottom: 8 }}>
-                        {en ? "Question 1 of 2" : "Tanong 1 ng 2"}
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.security_question = el}>
-                        <label className="fl">{en ? "Choose a Security Question *" : "Pumili ng Security Question *"}</label>
-                        <select className="fsel" style={errStyle("security_question")} value={form.security_question} onChange={e => { set("security_question", e.target.value); clearFieldError("security_question") }}>
-                            <option value="">{en ? "Select..." : "Pumili..."}</option>
-                            {SECURITY_QUESTIONS.map(q => <option key={q.key} value={q.key}>{en ? q.en : q.fil}</option>)}
-                        </select>
-                        <ErrMsg name="security_question" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.security_answer = el}>
-                        <label className="fl">{en ? "Your Answer *" : "Sagot Mo *"}</label>
-                        <input className="fi" style={errStyle("security_answer")} placeholder={en ? "Type your answer" : "I-type ang sagot"} value={form.security_answer} onChange={e => { set("security_answer", e.target.value); clearFieldError("security_answer") }} />
-                        <div className="fh">{en ? "Remember this exactly. Not case-sensitive." : "Tandaan ito nang eksakto. Hindi case-sensitive."}</div>
-                        <ErrMsg name="security_answer" />
-                    </div>
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 6, marginTop: 16 }}>
+                            {en ? "Account Recovery *" : "Pagbawi ng Account *"}
+                        </div>
+                        <p style={{ fontSize: 11, color: "var(--slate)", marginBottom: 10 }}>
+                            {en ? "Choose questions only you would know the answer to. In case SMS OTP doesn't arrive, these help you recover your account." : "Pumili ng mga tanong na ikaw lang ang nakakaalam ng sagot. Sakaling hindi dumating ang SMS OTP, makakatulong ang mga ito para mabawi ang account."}
+                        </p>
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: "var(--slate)", marginBottom: 8 }}>
+                            {en ? "Question 1 of 2" : "Tanong 1 ng 2"}
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.security_question = el}>
+                            <label className="fl">{en ? "Choose a Security Question *" : "Pumili ng Security Question *"}</label>
+                            <select className="fsel" style={errStyle("security_question")} value={form.security_question} onChange={e => { set("security_question", e.target.value); clearFieldError("security_question") }}>
+                                <option value="">{en ? "Select..." : "Pumili..."}</option>
+                                {SECURITY_QUESTIONS.map(q => <option key={q.key} value={q.key}>{en ? q.en : q.fil}</option>)}
+                            </select>
+                            <ErrMsg name="security_question" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.security_answer = el}>
+                            <label className="fl">{en ? "Your Answer *" : "Sagot Mo *"}</label>
+                            <input className="fi" style={errStyle("security_answer")} placeholder={en ? "Type your answer" : "I-type ang sagot"} value={form.security_answer} onChange={e => { set("security_answer", e.target.value); clearFieldError("security_answer") }} />
+                            <div className="fh">{en ? "Remember this exactly. Not case-sensitive." : "Tandaan ito nang eksakto. Hindi case-sensitive."}</div>
+                            <ErrMsg name="security_answer" />
+                        </div>
 
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: "var(--slate)", marginBottom: 8, marginTop: 12 }}>
-                        {en ? "Question 2 of 2" : "Tanong 2 ng 2"}
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: "var(--slate)", marginBottom: 8, marginTop: 12 }}>
+                            {en ? "Question 2 of 2" : "Tanong 2 ng 2"}
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.security_question_2 = el}>
+                            <label className="fl">{en ? "Choose a Second Security Question *" : "Pumili ng Pangalawang Security Question *"}</label>
+                            <select className="fsel" style={errStyle("security_question_2")} value={form.security_question_2} onChange={e => { set("security_question_2", e.target.value); clearFieldError("security_question_2") }}>
+                                <option value="">{en ? "Select..." : "Pumili..."}</option>
+                                {SECURITY_QUESTIONS.filter(q => q.key !== form.security_question).map(q => <option key={q.key} value={q.key}>{en ? q.en : q.fil}</option>)}
+                            </select>
+                            <ErrMsg name="security_question_2" />
+                        </div>
+                        <div className="fg" ref={el => fieldRefs.current.security_answer_2 = el}>
+                            <label className="fl">{en ? "Your Answer *" : "Sagot Mo *"}</label>
+                            <input className="fi" style={errStyle("security_answer_2")} placeholder={en ? "Type your answer" : "I-type ang sagot"} value={form.security_answer_2} onChange={e => { set("security_answer_2", e.target.value); clearFieldError("security_answer_2") }} />
+                            <div className="fh">{en ? "Remember this exactly. Not case-sensitive." : "Tandaan ito nang eksakto. Hindi case-sensitive."}</div>
+                            <ErrMsg name="security_answer_2" />
+                        </div>
                     </div>
-                    <div className="fg" ref={el => fieldRefs.current.security_question_2 = el}>
-                        <label className="fl">{en ? "Choose a Second Security Question *" : "Pumili ng Pangalawang Security Question *"}</label>
-                        <select className="fsel" style={errStyle("security_question_2")} value={form.security_question_2} onChange={e => { set("security_question_2", e.target.value); clearFieldError("security_question_2") }}>
-                            <option value="">{en ? "Select..." : "Pumili..."}</option>
-                            {SECURITY_QUESTIONS.filter(q => q.key !== form.security_question).map(q => <option key={q.key} value={q.key}>{en ? q.en : q.fil}</option>)}
-                        </select>
-                        <ErrMsg name="security_question_2" />
-                    </div>
-                    <div className="fg" ref={el => fieldRefs.current.security_answer_2 = el}>
-                        <label className="fl">{en ? "Your Answer *" : "Sagot Mo *"}</label>
-                        <input className="fi" style={errStyle("security_answer_2")} placeholder={en ? "Type your answer" : "I-type ang sagot"} value={form.security_answer_2} onChange={e => { set("security_answer_2", e.target.value); clearFieldError("security_answer_2") }} />
-                        <div className="fh">{en ? "Remember this exactly. Not case-sensitive." : "Tandaan ito nang eksakto. Hindi case-sensitive."}</div>
-                        <ErrMsg name="security_answer_2" />
-                    </div>
-                    </div>
-            <GuideBox stepIndex={3} />
+                    <GuideBox stepIndex={3} />
 
-            <div id="tut-step-4" style={getHighlightStyle(4)}>
-                <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 10, marginTop: 16 }}>
-                    {en ? "Terms and Conditions" : "Mga Tuntunin at Kundisyon"}
-                </div>
-                <div style={{ background: "var(--cream)", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", padding: 12, fontSize: 11, color: "var(--slate)", maxHeight: 140, overflowY: "auto", marginBottom: 12, lineHeight: 1.6 }}>
-                    <strong>{en ? "DATA PRIVACY CONSENT" : "PAHINTULOT SA DATA PRIVACY"}</strong> — {en ? "In accordance with Republic Act No. 10173 (Data Privacy Act of 2012), the information collected in this form shall be used solely for the purpose of processing, validation, and implementation of the Fuel Subsidy Program." : "Alinsunod sa Republic Act No. 10173 (Data Privacy Act of 2012), ang impormasyong nakolekta sa form na ito ay gagamitin lamang para sa Fuel Subsidy Program."}
-                </div>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16 }}>
-                    <input type="checkbox" id="consent" checked={consented} onChange={e => setConsented(e.target.checked)} style={{ marginTop: 2, cursor: "pointer", flexShrink: 0 }} />
-                    <label htmlFor="consent" style={{ fontSize: 12, color: "var(--slate)", cursor: "pointer", lineHeight: 1.5 }}>
-                        {en ? "I give my consent to the collection and processing of my personal data." : "Ibinibigay ko ang aking pahintulot sa pagkolekta at pagproseso ng aking personal na data."}
-                    </label>
-                </div>
+                    <div id="tut-step-4" style={getHighlightStyle(4)}>
+                        <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 10, marginTop: 16 }}>
+                            {en ? "Terms and Conditions" : "Mga Tuntunin at Kundisyon"}
+                        </div>
+                        <div style={{ background: "var(--cream)", borderRadius: "var(--r-sm)", border: "1px solid var(--border)", padding: 12, fontSize: 11, color: "var(--slate)", maxHeight: 140, overflowY: "auto", marginBottom: 12, lineHeight: 1.6 }}>
+                            <strong>{en ? "DATA PRIVACY CONSENT" : "PAHINTULOT SA DATA PRIVACY"}</strong> — {en ? "In accordance with Republic Act No. 10173 (Data Privacy Act of 2012), the information collected in this form shall be used solely for the purpose of processing, validation, and implementation of the Fuel Subsidy Program." : "Alinsunod sa Republic Act No. 10173 (Data Privacy Act of 2012), ang impormasyong nakolekta sa form na ito ay gagamitin lamang para sa Fuel Subsidy Program."}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16 }}>
+                            <input type="checkbox" id="consent" checked={consented} onChange={e => setConsented(e.target.checked)} style={{ marginTop: 2, cursor: "pointer", flexShrink: 0 }} />
+                            <label htmlFor="consent" style={{ fontSize: 12, color: "var(--slate)", cursor: "pointer", lineHeight: 1.5 }}>
+                                {en ? "I give my consent to the collection and processing of my personal data." : "Ibinibigay ko ang aking pahintulot sa pagkolekta at pagproseso ng aking personal na data."}
+                            </label>
+                        </div>
 
                         {error && <div className="alert amber">{error}</div>}
                         <button className="btn gold" type="submit" disabled={loading}>{en ? "Continue to Verification" : "Magpatuloy sa Verification"}</button>
@@ -2689,7 +2711,7 @@ function MyConcernsPage({ en, concerns, apps, driverId, showToast, refreshConcer
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
@@ -3089,7 +3111,7 @@ function Dashboard({ en, onNav, driver, apps, appointment, onUploadDocument, con
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "absolute",
                 top: "calc(100% + 12px)", // Automatically hangs just below the element
                 left: 0,
@@ -4016,7 +4038,7 @@ function Subsidies({ en, onNav, apps, allAppointments, driverId, showToast, refr
     function GuideBox({stepIndex}) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0 20px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
@@ -4357,7 +4379,7 @@ function Apply({
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
@@ -4981,328 +5003,328 @@ function Apply({
 }
 
 // ─── APPOINTMENT ──────────────────────────────────────────────────────────────
-    function Appointment({en, appointment}) {
-        const [qr, setQr] = useState(false)
-        const [rescheduled, setRescheduled] = useState(false)
+function Appointment({en, appointment}) {
+    const [qr, setQr] = useState(false)
+    const [rescheduled, setRescheduled] = useState(false)
 
-        if (!appointment) {
-            return (
-                <div>
-                    <div className="ph"><h1>{en ? "My Schedule" : "Ang Aking Iskedyul"}</h1>
-                        <p>{en ? "Your assigned payout slot" : "Ang iyong itinalagang slot ng payout"}</p></div>
-                    <div className="pad">
-                        <div className="empty">
-                            <div className="empty-ico">📅</div>
-                            <div>{en ? "No appointment yet. Apply for a subsidy to get a schedule." : "Wala pang appointment. Mag-apply ng subsidy para makakuha ng iskedyul."}</div>
-                        </div>
-                    </div>
-                </div>
-            )
-        }
-
+    if (!appointment) {
         return (
             <div>
                 <div className="ph"><h1>{en ? "My Schedule" : "Ang Aking Iskedyul"}</h1>
                     <p>{en ? "Your assigned payout slot" : "Ang iyong itinalagang slot ng payout"}</p></div>
                 <div className="pad">
-                    <div className="appt-card">
-                        <div className="appt-label">ACTIVE APPOINTMENT</div>
-                        <div className="appt-prog">{appointment.payout_events?.program_name}</div>
-                        <div className="appt-row"><span className="appt-ico">📅</span>
-                            <div className="appt-txt">{appointment.assigned_date}<small>{appointment.time_slot}</small>
-                            </div>
-                        </div>
-                        <div className="appt-row"><span className="appt-ico">📍</span>
-                            <div
-                                className="appt-txt">{appointment.venue}<small>{en ? "Bring Driver's License + this reference" : "Dalhin ang Driver's License + reference na ito"}</small>
-                            </div>
-                        </div>
-                        <div className="appt-ref">{en ? "Ref:" : "Ref:"} <strong>{appointment.reference_code}</strong>
-                        </div>
+                    <div className="empty">
+                        <div className="empty-ico">📅</div>
+                        <div>{en ? "No appointment yet. Apply for a subsidy to get a schedule." : "Wala pang appointment. Mag-apply ng subsidy para makakuha ng iskedyul."}</div>
                     </div>
-                    {qr && (
-                        <div className="qr-box">
-                            <div className="qr-sq">▦</div>
-                            <div
-                                className="qr-cap">{en ? "Show this to the officer at the venue." : "Ipakita ito sa opisyal sa venue."}</div>
-                            <div className="qr-ref">{appointment.reference_code}</div>
-                        </div>
-                    )}
-                    <button className="btn gold"
-                            onClick={() => setQr(!qr)}>{qr ? (en ? "Hide QR Code" : "Itago ang QR") : (en ? "Show QR Code" : "Ipakita ang QR")}</button>
-                    {!rescheduled ? (
-                        <button className="btn outline"
-                                onClick={() => setRescheduled(true)}>{en ? "I cannot make this schedule" : "Hindi ako makakarating sa oras na ito"}</button>
-                    ) : (
-                        <div className="alert amber">
-                            <strong>{en ? "Noted." : "Natanggap."}</strong><br/>{en ? "Please come during walk-in hours. Bring your Driver's License." : "Pumunta sa walk-in hours. Dalhin ang Driver's License."}
-                        </div>
-                    )}
                 </div>
             </div>
         )
     }
 
+    return (
+        <div>
+            <div className="ph"><h1>{en ? "My Schedule" : "Ang Aking Iskedyul"}</h1>
+                <p>{en ? "Your assigned payout slot" : "Ang iyong itinalagang slot ng payout"}</p></div>
+            <div className="pad">
+                <div className="appt-card">
+                    <div className="appt-label">ACTIVE APPOINTMENT</div>
+                    <div className="appt-prog">{appointment.payout_events?.program_name}</div>
+                    <div className="appt-row"><span className="appt-ico">📅</span>
+                        <div className="appt-txt">{appointment.assigned_date}<small>{appointment.time_slot}</small>
+                        </div>
+                    </div>
+                    <div className="appt-row"><span className="appt-ico">📍</span>
+                        <div
+                            className="appt-txt">{appointment.venue}<small>{en ? "Bring Driver's License + this reference" : "Dalhin ang Driver's License + reference na ito"}</small>
+                        </div>
+                    </div>
+                    <div className="appt-ref">{en ? "Ref:" : "Ref:"} <strong>{appointment.reference_code}</strong>
+                    </div>
+                </div>
+                {qr && (
+                    <div className="qr-box">
+                        <div className="qr-sq">▦</div>
+                        <div
+                            className="qr-cap">{en ? "Show this to the officer at the venue." : "Ipakita ito sa opisyal sa venue."}</div>
+                        <div className="qr-ref">{appointment.reference_code}</div>
+                    </div>
+                )}
+                <button className="btn gold"
+                        onClick={() => setQr(!qr)}>{qr ? (en ? "Hide QR Code" : "Itago ang QR") : (en ? "Show QR Code" : "Ipakita ang QR")}</button>
+                {!rescheduled ? (
+                    <button className="btn outline"
+                            onClick={() => setRescheduled(true)}>{en ? "I cannot make this schedule" : "Hindi ako makakarating sa oras na ito"}</button>
+                ) : (
+                    <div className="alert amber">
+                        <strong>{en ? "Noted." : "Natanggap."}</strong><br/>{en ? "Please come during walk-in hours. Bring your Driver's License." : "Pumunta sa walk-in hours. Dalhin ang Driver's License."}
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
 // ─── NOTIFICATIONS (UPDATES ENGINE REAL-TIME COUPLING) ──────────────────────
-    function Notifications({en, apps, appointment, driver, openEvents, onOpenModal}) {
-        const notifs = []
-        const now = new Date()
-        const existingEventIds = apps.map(a => a.event_id)
+function Notifications({en, apps, appointment, driver, openEvents, onOpenModal}) {
+    const notifs = []
+    const now = new Date()
+    const existingEventIds = apps.map(a => a.event_id)
 
-        if (driver) {
-            if (driver.verification_status === "verified") {
-                notifs.push({
-                    type: "approved", time: en ? "Verification" : "Verification",
-                    msg_en: "✅ Your account has been verified. Future applications will auto-fill.",
-                    msg_fil: "✅ Na-verify na ang iyong account. Awtomatikong mapupunan ang mga susunod na aplikasyon.",
-                    modal: {
-                        icon: "✅",
-                        title: en ? "Account Verified!" : "Na-verify ang Account!",
-                        body: en ? "Your identity has been verified. Future subsidy applications will auto-fill from your profile." : "Na-verify na ang iyong pagkakakilanlan. Awtomatikong mapupunan ang mga susunod na aplikasyon.",
-                        closeLabel: en ? "Got it" : "Nakuha ko",
-                    }
-                })
-            } else if (driver.verification_status === "rejected") {
-                notifs.push({
-                    type: "rejected", time: en ? "Verification" : "Verification",
-                    msg_en: `❌ Verification rejected. Please correct: ${driver.verification_notes || "flagged fields"}`,
-                    msg_fil: `❌ Tinanggihan ang verification. Pakitama: ${driver.verification_notes || "mga field"}`,
-                    modal: {
-                        icon: "❌",
-                        title: en ? "Verification Rejected" : "Tinanggihan ang Verification",
-                        body: en ? `Please correct: ${driver.verification_notes}` : `Pakitama: ${driver.verification_notes}`,
-                        action: "editprofile",
-                        actionLabel: en ? "Edit My Information" : "I-edit ang Aking Impormasyon",
-                        closeLabel: en ? "Later" : "Mamaya na",
-                    }
-                })
-            } else {
-                notifs.push({
-                    type: "info", time: en ? "Verification" : "Verification",
-                    msg_en: "⏳ Verification is being reviewed. Expect results within 5–7 business days.",
-                    msg_fil: "⏳ Sinusuri ang verification. Asahan ang resulta sa loob ng 5–7 araw ng trabaho.",
-                    modal: null
-                })
-            }
-        }
-
-        ;(openEvents || []).forEach(ev => {
-            if (existingEventIds.includes(ev.id)) return
-            if (!ev.application_deadline || new Date(ev.application_deadline) < now) return
-            const publishedRecently = (now - new Date(ev.created_at || now)) / (1000 * 60 * 60 * 24) <= 3
-            if (publishedRecently) {
-                notifs.unshift({
-                    type: "info", time: en ? "New" : "Bago",
-                    msg_en: `📢 New subsidy available: ${ev.program_name} (${ev.program_amount}). Apply before ${new Date(ev.application_deadline).toLocaleString("en-PH", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit"
-                    })}.`,
-                    msg_fil: `📢 Bagong subsidy: ${ev.program_name} (${ev.program_amount}). Mag-apply bago ang ${new Date(ev.application_deadline).toLocaleString("en-PH", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit"
-                    })}.`,
-                    modal: {
-                        icon: "📢",
-                        title: en ? "New Subsidy Available!" : "Bagong Subsidy!",
-                        body: en
-                            ? `${ev.program_name} (${ev.program_amount}) is now open. Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "2-digit"
-                            })}.`
-                            : `Bukas na ang ${ev.program_name} (${ev.program_amount}). Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "2-digit"
-                            })}.`,
-                        action: {type: "apply", eventId: ev.id},
-                        actionLabel: en ? "Apply Now" : "Mag-apply Na",
-                        closeLabel: en ? "Maybe Later" : "Mamaya Na Lang",
-                    }
-                })
-            }
-        })
-
-        apps.forEach(a => {
-            const deadline = a.payout_events?.application_deadline
-            if (deadline) {
-                const hoursLeft = (new Date(deadline) - now) / (1000 * 60 * 60)
-                if (hoursLeft > 0 && hoursLeft <= 48) {
-                    notifs.unshift({
-                        type: "rejected",
-                        time: hoursLeft <= 24 ? (en ? "Today" : "Ngayon") : (en ? "Tomorrow" : "Bukas"),
-                        msg_en: `⚠️ Deadline for ${a.payout_events?.program_name}: ${new Date(deadline).toLocaleString("en-PH", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit"
-                        })}`,
-                        msg_fil: `⚠️ Deadline ng ${a.payout_events?.program_name}: ${new Date(deadline).toLocaleString("en-PH", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit"
-                        })}`,
-                        modal: null
-                    })
-                }
-            }
-            if (a.status === "approved") {
-                notifs.push({
-                    type: "approved", time: en ? "Recent" : "Kamakailan",
-                    msg_en: `🎉 ${a.payout_events?.program_name} approved! Claim at ${a.payout_events?.venue} on ${a.payout_events?.event_date}.`,
-                    msg_fil: `🎉 Naaprubahan ang ${a.payout_events?.program_name}! Kunin sa ${a.payout_events?.venue} sa ${a.payout_events?.event_date}.`,
-                    modal: {
-                        icon: "🎉",
-                        title: en ? "Application Approved!" : "Naaprubahan ang Aplikasyon!",
-                        body: en
-                            ? `Your application for ${a.payout_events?.program_name} was approved. Claim at ${a.payout_events?.venue} on ${a.payout_events?.event_date}.`
-                            : `Naaprubahan ang ${a.payout_events?.program_name}. Kunin sa ${a.payout_events?.venue} sa ${a.payout_events?.event_date}.`,
-                        action: {type: "view_subsidy", appId: a.id},
-                        actionLabel: en ? "View Details" : "Tingnan ang Detalye",
-                        closeLabel: en ? "Got it" : "Nakuha ko",
-                    }
-                })
-            } else if (a.status === "pending") {
-                notifs.push({
-                    type: "info", time: en ? "Recent" : "Kamakailan",
-                    msg_en: `${a.payout_events?.program_name} application is pending review.`,
-                    msg_fil: `Ang aplikasyon sa ${a.payout_events?.program_name} ay naghihintay ng review.`,
-                    modal: null
-                })
-            } else if (a.status === "rejected" && a.rejection_fields) {
-                notifs.push({
-                    type: "rejected", time: en ? "Recent" : "Kamakailan",
-                    msg_en: `❌ ${a.payout_events?.program_name} rejected. Reason: ${a.rejection_fields}`,
-                    msg_fil: `❌ Tinanggihan ang ${a.payout_events?.program_name}. Dahilan: ${a.rejection_fields}`,
-                    modal: {
-                        icon: "❌",
-                        title: en ? "Application Rejected" : "Tinanggihan ang Aplikasyon",
-                        body: en
-                            ? `Your application for ${a.payout_events?.program_name} was rejected. Reason: ${a.rejection_fields}.`
-                            : `Tinanggihan ang ${a.payout_events?.program_name}. Dahilan: ${a.rejection_fields}.`,
-                        action: "editprofile",
-                        actionLabel: en ? "Edit My Information" : "I-edit ang Impormasyon",
-                        action2: {type: "view_subsidy", appId: a.id},
-                        action2Label: en ? "View Application" : "Tingnan ang Aplikasyon",
-                        closeLabel: en ? "Later" : "Mamaya na",
-                    }
-                })
-            }
-        })
-
-        if (appointment) {
+    if (driver) {
+        if (driver.verification_status === "verified") {
             notifs.push({
-                type: "appointment", time: en ? "Recent" : "Kamakailan",
-                msg_en: `📅 Appointment confirmed: ${appointment.assigned_date}, ${appointment.time_slot}, ${appointment.venue}.`,
-                msg_fil: `📅 Nakumpirma ang appointment: ${appointment.assigned_date}, ${appointment.time_slot}, ${appointment.venue}.`,
+                type: "approved", time: en ? "Verification" : "Verification",
+                msg_en: "✅ Your account has been verified. Future applications will auto-fill.",
+                msg_fil: "✅ Na-verify na ang iyong account. Awtomatikong mapupunan ang mga susunod na aplikasyon.",
                 modal: {
-                    icon: "📅",
-                    title: en ? "Appointment Confirmed" : "Nakumpirma ang Appointment",
-                    body: en
-                        ? `Your payout slot is on ${appointment.assigned_date} at ${appointment.time_slot}, ${appointment.venue}. Ref: ${appointment.reference_code}`
-                        : `Ang iyong slot ay sa ${appointment.assigned_date} sa ${appointment.time_slot}, ${appointment.venue}. Ref: ${appointment.reference_code}`,
-                    action: {type: "view_subsidy", appId: appointment.application_id},
-                    actionLabel: en ? "View My Subsidies" : "Tingnan ang Mga Subsidy",
+                    icon: "✅",
+                    title: en ? "Account Verified!" : "Na-verify ang Account!",
+                    body: en ? "Your identity has been verified. Future subsidy applications will auto-fill from your profile." : "Na-verify na ang iyong pagkakakilanlan. Awtomatikong mapupunan ang mga susunod na aplikasyon.",
                     closeLabel: en ? "Got it" : "Nakuha ko",
                 }
             })
+        } else if (driver.verification_status === "rejected") {
+            notifs.push({
+                type: "rejected", time: en ? "Verification" : "Verification",
+                msg_en: `❌ Verification rejected. Please correct: ${driver.verification_notes || "flagged fields"}`,
+                msg_fil: `❌ Tinanggihan ang verification. Pakitama: ${driver.verification_notes || "mga field"}`,
+                modal: {
+                    icon: "❌",
+                    title: en ? "Verification Rejected" : "Tinanggihan ang Verification",
+                    body: en ? `Please correct: ${driver.verification_notes}` : `Pakitama: ${driver.verification_notes}`,
+                    action: "editprofile",
+                    actionLabel: en ? "Edit My Information" : "I-edit ang Aking Impormasyon",
+                    closeLabel: en ? "Later" : "Mamaya na",
+                }
+            })
+        } else {
+            notifs.push({
+                type: "info", time: en ? "Verification" : "Verification",
+                msg_en: "⏳ Verification is being reviewed. Expect results within 5–7 business days.",
+                msg_fil: "⏳ Sinusuri ang verification. Asahan ang resulta sa loob ng 5–7 araw ng trabaho.",
+                modal: null
+            })
         }
-
-        return (
-            <div>
-                <div className="ph"><h1>{en ? "Updates" : "Mga Update"}</h1>
-                    <p>{en ? "Tap any item for details and actions" : "I-tap ang anumang item para sa detalye at aksyon"}</p>
-                </div>
-                <div className="pad">
-                    {notifs.length === 0 ? (
-                        <div className="empty">
-                            <div className="empty-ico">🔔</div>
-                            <div>{en ? "No updates yet." : "Wala pang update."}</div>
-                        </div>
-                    ) : notifs.map((n, i) => (
-                        <div
-                            className="notif"
-                            key={i}
-                            style={{cursor: n.modal ? "pointer" : "default"}}
-                            onClick={() => n.modal && onOpenModal && onOpenModal(n.modal)}
-                        >
-                            <div className={`ndot ${n.type}`}/>
-                            <div style={{flex: 1}}>
-                                <div className="nmsg">{en ? n.msg_en : n.msg_fil}</div>
-                                <div
-                                    className="ntime">{n.time}{n.modal ? ` · ${en ? "tap for details" : "i-tap para sa detalye"}` : ""}</div>
-                            </div>
-                            {n.modal &&
-                                <div style={{color: "var(--gold-dk)", fontSize: 16, alignSelf: "center"}}>›</div>}
-                        </div>
-                    ))}
-                </div>
-            </div>
-        )
     }
 
-    function ConcernThread({concerns, en}) {
-        if (!concerns || concerns.length === 0) return null
-        return (
-            <div style={{marginBottom: 16}}>
-                <div style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    color: "var(--navy)",
-                    marginBottom: 8
-                }}>
-                    💬 {en ? "Your previous messages on this topic:" : "Mga nakaraang mensahe mo sa paksang ito:"}
-                </div>
-                {concerns.map(c => (
-                    <div key={c.id} style={{marginBottom: 10}}>
-                        <div style={{
-                            background: "var(--cream)",
-                            borderRadius: "var(--r-sm)",
-                            padding: "10px 12px",
-                            fontSize: 13,
-                            color: "var(--navy)"
-                        }}>
-                            <div style={{fontSize: 11, color: "var(--slate)", marginBottom: 4}}>
-                                {c.is_draft || c.status === "draft"
-                                    ? <span style={{
-                                        color: "var(--amber)",
-                                        fontWeight: 600
-                                    }}>📝 {en ? "Draft" : "Draft"}</span>
-                                    : <span
-                                        style={{color: "var(--slate)"}}>{en ? "You" : "Ikaw"} · {new Date(c.created_at).toLocaleDateString()}</span>
-                                }
-                            </div>
-                            {c.message}
+    ;(openEvents || []).forEach(ev => {
+        if (existingEventIds.includes(ev.id)) return
+        if (!ev.application_deadline || new Date(ev.application_deadline) < now) return
+        const publishedRecently = (now - new Date(ev.created_at || now)) / (1000 * 60 * 60 * 24) <= 3
+        if (publishedRecently) {
+            notifs.unshift({
+                type: "info", time: en ? "New" : "Bago",
+                msg_en: `📢 New subsidy available: ${ev.program_name} (${ev.program_amount}). Apply before ${new Date(ev.application_deadline).toLocaleString("en-PH", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit"
+                })}.`,
+                msg_fil: `📢 Bagong subsidy: ${ev.program_name} (${ev.program_amount}). Mag-apply bago ang ${new Date(ev.application_deadline).toLocaleString("en-PH", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit"
+                })}.`,
+                modal: {
+                    icon: "📢",
+                    title: en ? "New Subsidy Available!" : "Bagong Subsidy!",
+                    body: en
+                        ? `${ev.program_name} (${ev.program_amount}) is now open. Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit"
+                        })}.`
+                        : `Bukas na ang ${ev.program_name} (${ev.program_amount}). Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit"
+                        })}.`,
+                    action: {type: "apply", eventId: ev.id},
+                    actionLabel: en ? "Apply Now" : "Mag-apply Na",
+                    closeLabel: en ? "Maybe Later" : "Mamaya Na Lang",
+                }
+            })
+        }
+    })
+
+    apps.forEach(a => {
+        const deadline = a.payout_events?.application_deadline
+        if (deadline) {
+            const hoursLeft = (new Date(deadline) - now) / (1000 * 60 * 60)
+            if (hoursLeft > 0 && hoursLeft <= 48) {
+                notifs.unshift({
+                    type: "rejected",
+                    time: hoursLeft <= 24 ? (en ? "Today" : "Ngayon") : (en ? "Tomorrow" : "Bukas"),
+                    msg_en: `⚠️ Deadline for ${a.payout_events?.program_name}: ${new Date(deadline).toLocaleString("en-PH", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit"
+                    })}`,
+                    msg_fil: `⚠️ Deadline ng ${a.payout_events?.program_name}: ${new Date(deadline).toLocaleString("en-PH", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit"
+                    })}`,
+                    modal: null
+                })
+            }
+        }
+        if (a.status === "approved") {
+            notifs.push({
+                type: "approved", time: en ? "Recent" : "Kamakailan",
+                msg_en: `🎉 ${a.payout_events?.program_name} approved! Claim at ${a.payout_events?.venue} on ${a.payout_events?.event_date}.`,
+                msg_fil: `🎉 Naaprubahan ang ${a.payout_events?.program_name}! Kunin sa ${a.payout_events?.venue} sa ${a.payout_events?.event_date}.`,
+                modal: {
+                    icon: "🎉",
+                    title: en ? "Application Approved!" : "Naaprubahan ang Aplikasyon!",
+                    body: en
+                        ? `Your application for ${a.payout_events?.program_name} was approved. Claim at ${a.payout_events?.venue} on ${a.payout_events?.event_date}.`
+                        : `Naaprubahan ang ${a.payout_events?.program_name}. Kunin sa ${a.payout_events?.venue} sa ${a.payout_events?.event_date}.`,
+                    action: {type: "view_subsidy", appId: a.id},
+                    actionLabel: en ? "View Details" : "Tingnan ang Detalye",
+                    closeLabel: en ? "Got it" : "Nakuha ko",
+                }
+            })
+        } else if (a.status === "pending") {
+            notifs.push({
+                type: "info", time: en ? "Recent" : "Kamakailan",
+                msg_en: `${a.payout_events?.program_name} application is pending review.`,
+                msg_fil: `Ang aplikasyon sa ${a.payout_events?.program_name} ay naghihintay ng review.`,
+                modal: null
+            })
+        } else if (a.status === "rejected" && a.rejection_fields) {
+            notifs.push({
+                type: "rejected", time: en ? "Recent" : "Kamakailan",
+                msg_en: `❌ ${a.payout_events?.program_name} rejected. Reason: ${a.rejection_fields}`,
+                msg_fil: `❌ Tinanggihan ang ${a.payout_events?.program_name}. Dahilan: ${a.rejection_fields}`,
+                modal: {
+                    icon: "❌",
+                    title: en ? "Application Rejected" : "Tinanggihan ang Aplikasyon",
+                    body: en
+                        ? `Your application for ${a.payout_events?.program_name} was rejected. Reason: ${a.rejection_fields}.`
+                        : `Tinanggihan ang ${a.payout_events?.program_name}. Dahilan: ${a.rejection_fields}.`,
+                    action: "editprofile",
+                    actionLabel: en ? "Edit My Information" : "I-edit ang Impormasyon",
+                    action2: {type: "view_subsidy", appId: a.id},
+                    action2Label: en ? "View Application" : "Tingnan ang Aplikasyon",
+                    closeLabel: en ? "Later" : "Mamaya na",
+                }
+            })
+        }
+    })
+
+    if (appointment) {
+        notifs.push({
+            type: "appointment", time: en ? "Recent" : "Kamakailan",
+            msg_en: `📅 Appointment confirmed: ${appointment.assigned_date}, ${appointment.time_slot}, ${appointment.venue}.`,
+            msg_fil: `📅 Nakumpirma ang appointment: ${appointment.assigned_date}, ${appointment.time_slot}, ${appointment.venue}.`,
+            modal: {
+                icon: "📅",
+                title: en ? "Appointment Confirmed" : "Nakumpirma ang Appointment",
+                body: en
+                    ? `Your payout slot is on ${appointment.assigned_date} at ${appointment.time_slot}, ${appointment.venue}. Ref: ${appointment.reference_code}`
+                    : `Ang iyong slot ay sa ${appointment.assigned_date} sa ${appointment.time_slot}, ${appointment.venue}. Ref: ${appointment.reference_code}`,
+                action: {type: "view_subsidy", appId: appointment.application_id},
+                actionLabel: en ? "View My Subsidies" : "Tingnan ang Mga Subsidy",
+                closeLabel: en ? "Got it" : "Nakuha ko",
+            }
+        })
+    }
+
+    return (
+        <div>
+            <div className="ph"><h1>{en ? "Updates" : "Mga Update"}</h1>
+                <p>{en ? "Tap any item for details and actions" : "I-tap ang anumang item para sa detalye at aksyon"}</p>
+            </div>
+            <div className="pad">
+                {notifs.length === 0 ? (
+                    <div className="empty">
+                        <div className="empty-ico">🔔</div>
+                        <div>{en ? "No updates yet." : "Wala pang update."}</div>
+                    </div>
+                ) : notifs.map((n, i) => (
+                    <div
+                        className="notif"
+                        key={i}
+                        style={{cursor: n.modal ? "pointer" : "default"}}
+                        onClick={() => n.modal && onOpenModal && onOpenModal(n.modal)}
+                    >
+                        <div className={`ndot ${n.type}`}/>
+                        <div style={{flex: 1}}>
+                            <div className="nmsg">{en ? n.msg_en : n.msg_fil}</div>
+                            <div
+                                className="ntime">{n.time}{n.modal ? ` · ${en ? "tap for details" : "i-tap para sa detalye"}` : ""}</div>
                         </div>
-                        {c.admin_reply && (
-                            <div style={{
-                                background: "var(--jade-bg)",
-                                border: "1px solid var(--jade)",
-                                borderRadius: "var(--r-sm)",
-                                padding: "10px 12px",
-                                fontSize: 13,
-                                color: "var(--navy)",
-                                marginTop: 4
-                            }}>
-                                <div style={{fontSize: 11, color: "var(--jade)", fontWeight: 700, marginBottom: 4}}>
-                                    🏛️ {en ? "Response from Agency" : "Tugon mula sa Ahensya"} · {c.replied_at ? new Date(c.replied_at).toLocaleDateString() : ""}
-                                </div>
-                                {c.admin_reply}
-                            </div>
-                        )}
+                        {n.modal &&
+                            <div style={{color: "var(--gold-dk)", fontSize: 16, alignSelf: "center"}}>›</div>}
                     </div>
                 ))}
             </div>
-        )
-    }
+        </div>
+    )
+}
+
+function ConcernThread({concerns, en}) {
+    if (!concerns || concerns.length === 0) return null
+    return (
+        <div style={{marginBottom: 16}}>
+            <div style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 700,
+                fontSize: 13,
+                color: "var(--navy)",
+                marginBottom: 8
+            }}>
+                💬 {en ? "Your previous messages on this topic:" : "Mga nakaraang mensahe mo sa paksang ito:"}
+            </div>
+            {concerns.map(c => (
+                <div key={c.id} style={{marginBottom: 10}}>
+                    <div style={{
+                        background: "var(--cream)",
+                        borderRadius: "var(--r-sm)",
+                        padding: "10px 12px",
+                        fontSize: 13,
+                        color: "var(--navy)"
+                    }}>
+                        <div style={{fontSize: 11, color: "var(--slate)", marginBottom: 4}}>
+                            {c.is_draft || c.status === "draft"
+                                ? <span style={{
+                                    color: "var(--amber)",
+                                    fontWeight: 600
+                                }}>📝 {en ? "Draft" : "Draft"}</span>
+                                : <span
+                                    style={{color: "var(--slate)"}}>{en ? "You" : "Ikaw"} · {new Date(c.created_at).toLocaleDateString()}</span>
+                            }
+                        </div>
+                        {c.message}
+                    </div>
+                    {c.admin_reply && (
+                        <div style={{
+                            background: "var(--jade-bg)",
+                            border: "1px solid var(--jade)",
+                            borderRadius: "var(--r-sm)",
+                            padding: "10px 12px",
+                            fontSize: 13,
+                            color: "var(--navy)",
+                            marginTop: 4
+                        }}>
+                            <div style={{fontSize: 11, color: "var(--jade)", fontWeight: 700, marginBottom: 4}}>
+                                🏛️ {en ? "Response from Agency" : "Tugon mula sa Ahensya"} · {c.replied_at ? new Date(c.replied_at).toLocaleDateString() : ""}
+                            </div>
+                            {c.admin_reply}
+                        </div>
+                    )}
+                </div>
+            ))}
+        </div>
+    )
+}
 
 function HelpCenter({en, apps, driverId, showToast, onNav, preselectedAppId, showTutorial, setShowTutorial}) {
     const [selectedApp, setSelectedApp] = useState(
@@ -5407,7 +5429,7 @@ function HelpCenter({en, apps, driverId, showToast, onNav, preselectedAppId, sho
     function GuideBox({stepIndex}) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{
+            <div className="guide-box" style={{
                 position: "relative", zIndex: 1000,
                 background: "var(--navy)", borderRadius: "var(--r)", padding: "16px",
                 margin: "10px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
@@ -5999,7 +6021,7 @@ function EditProfile({ en, driverId, driver, showToast, onDone, showTutorial, se
     function GuideBox({ stepIndex }) {
         if (!showTutorial || tutStep !== stepIndex) return null
         return (
-            <div style={{ position: "relative", zIndex: 1000, background: "var(--navy)", borderRadius: "var(--r)", padding: "16px", margin: "10px 0 20px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)", pointerEvents: "auto", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="guide-box" style={{ position: "relative", zIndex: 1000, background: "var(--navy)", borderRadius: "var(--r)", padding: "16px", margin: "10px 0 20px 0", boxShadow: "0 8px 24px rgba(0,0,0,0.35)", pointerEvents: "auto", border: "1px solid rgba(255,255,255,0.1)" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "var(--gold)", marginBottom: 6 }}>💡 {tutStep + 1}/{tutSteps.length}</div>
                 <div style={{ fontSize: 13, color: "#fff", marginBottom: 14, lineHeight: 1.6 }}>{en ? tutSteps[tutStep].en : tutSteps[tutStep].fil}</div>
                 <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
@@ -6142,28 +6164,28 @@ function EditProfile({ en, driverId, driver, showToast, onDone, showTutorial, se
     )
 }
 
-    function AdminReplyInline({grievance, en, showToast, onDone}) {
-        const [open, setOpen] = useState(false)
-        const [reply, setReply] = useState(grievance.admin_reply || "")
-        const [saving, setSaving] = useState(false)
+function AdminReplyInline({grievance, en, showToast, onDone}) {
+    const [open, setOpen] = useState(false)
+    const [reply, setReply] = useState(grievance.admin_reply || "")
+    const [saving, setSaving] = useState(false)
 
-        async function sendReply() {
-            if (!reply.trim()) return
-            setSaving(true)
-            await supabase.from("grievances").update({
-                admin_reply: reply,
-                replied_at: new Date().toISOString(),
-                driver_seen_reply: false,
-                status: "replied",
-            }).eq("id", grievance.id)
-            setSaving(false)
-            setOpen(false)
-            showToast(en ? "Reply sent." : "Naipadala ang tugon.")
-            onDone()
-        }
+    async function sendReply() {
+        if (!reply.trim()) return
+        setSaving(true)
+        await supabase.from("grievances").update({
+            admin_reply: reply,
+            replied_at: new Date().toISOString(),
+            driver_seen_reply: false,
+            status: "replied",
+        }).eq("id", grievance.id)
+        setSaving(false)
+        setOpen(false)
+        showToast(en ? "Reply sent." : "Naipadala ang tugon.")
+        onDone()
+    }
 
-        return open ? (
-            <div style={{width: "100%"}}>
+    return open ? (
+        <div style={{width: "100%"}}>
         <textarea
             className="fta"
             style={{minHeight: 200, fontSize: 13, marginBottom: 6, width: "100%", resize: "vertical"}}
@@ -6171,129 +6193,129 @@ function EditProfile({ en, driverId, driver, showToast, onDone, showTutorial, se
             value={reply}
             onChange={e => setReply(e.target.value)}
         />
-                <div style={{display: "flex", gap: 6}}>
-                    <button className="btn sm jade" onClick={sendReply}
-                            disabled={saving}>{saving ? "..." : (en ? "Send Reply" : "Ipadala")}</button>
-                    <button className="btn sm outline"
-                            onClick={() => setOpen(false)}>{en ? "Cancel" : "Kanselahin"}</button>
-                </div>
+            <div style={{display: "flex", gap: 6}}>
+                <button className="btn sm jade" onClick={sendReply}
+                        disabled={saving}>{saving ? "..." : (en ? "Send Reply" : "Ipadala")}</button>
+                <button className="btn sm outline"
+                        onClick={() => setOpen(false)}>{en ? "Cancel" : "Kanselahin"}</button>
             </div>
-        ) : (
-            <button className="btn sm navy-o" onClick={() => setOpen(true)}>
-                ✉️ {grievance.admin_reply ? (en ? "Edit Reply" : "I-edit ang Tugon") : (en ? "Reply" : "Tumugon")}
-            </button>
-        )
+        </div>
+    ) : (
+        <button className="btn sm navy-o" onClick={() => setOpen(true)}>
+            ✉️ {grievance.admin_reply ? (en ? "Edit Reply" : "I-edit ang Tugon") : (en ? "Reply" : "Tumugon")}
+        </button>
+    )
+}
+
+function AdminGrievanceChat({grievance, en, showToast, onBack, onDone}) {
+    const [reply, setReply] = useState("")
+    const [saving, setSaving] = useState(false)
+
+    const thread = [
+        {
+            id: `opening-${grievance.id}`,
+            message: grievance.message,
+            sent_by: "driver",
+            created_at: grievance.created_at
+        },
+        ...(grievance.grievance_messages || [])
+    ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+
+    async function sendReply() {
+        if (!reply.trim()) return
+        setSaving(true)
+        await supabase.from("grievance_messages").insert({
+            grievance_id: grievance.id,
+            message: reply,
+            sent_by: "admin",
+        })
+        await supabase.from("grievances").update({
+            driver_seen_reply: false,
+            status: "replied",
+        }).eq("id", grievance.id)
+        setReply("")
+        setSaving(false)
+        showToast(en ? "Reply sent." : "Naipadala ang tugon.")
+        onDone()
     }
 
-    function AdminGrievanceChat({grievance, en, showToast, onBack, onDone}) {
-        const [reply, setReply] = useState("")
-        const [saving, setSaving] = useState(false)
+    async function markResolved() {
+        await supabase.from("grievances").update({status: "resolved"}).eq("id", grievance.id)
+        showToast(en ? "Marked as resolved." : "Naitala bilang nalutas.")
+        onDone()
+    }
 
-        const thread = [
-            {
-                id: `opening-${grievance.id}`,
-                message: grievance.message,
-                sent_by: "driver",
-                created_at: grievance.created_at
-            },
-            ...(grievance.grievance_messages || [])
-        ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+    const programName = grievance.applications?.payout_events?.program_name || (en ? "General Inquiry" : "Pangkalahatang Tanong")
 
-        async function sendReply() {
-            if (!reply.trim()) return
-            setSaving(true)
-            await supabase.from("grievance_messages").insert({
-                grievance_id: grievance.id,
-                message: reply,
-                sent_by: "admin",
-            })
-            await supabase.from("grievances").update({
-                driver_seen_reply: false,
-                status: "replied",
-            }).eq("id", grievance.id)
-            setReply("")
-            setSaving(false)
-            showToast(en ? "Reply sent." : "Naipadala ang tugon.")
-            onDone()
-        }
-
-        async function markResolved() {
-            await supabase.from("grievances").update({status: "resolved"}).eq("id", grievance.id)
-            showToast(en ? "Marked as resolved." : "Naitala bilang nalutas.")
-            onDone()
-        }
-
-        const programName = grievance.applications?.payout_events?.program_name || (en ? "General Inquiry" : "Pangkalahatang Tanong")
-
-        return (
-            <div className="asec">
+    return (
+        <div className="asec">
                 <span className="link"
                       onClick={onBack}>← {en ? "Back to Help Requests" : "Bumalik sa mga Hiling ng Tulong"}</span>
-                <div className="spacer"/>
-                <div className="card" style={{marginBottom: 12}}>
-                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
-                        <div>
-                            <div style={{
-                                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                fontWeight: 700,
-                                fontSize: 14,
-                                color: "var(--navy)"
-                            }}>
-                                {grievance.drivers?.full_name} · {grievance.drivers?.mobile}
-                            </div>
-                            <div style={{
-                                fontSize: 12,
-                                color: "var(--slate)",
-                                marginTop: 2
-                            }}>📋 {programName} · {grievance.concern_type}</div>
+            <div className="spacer"/>
+            <div className="card" style={{marginBottom: 12}}>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
+                    <div>
+                        <div style={{
+                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontWeight: 700,
+                            fontSize: 14,
+                            color: "var(--navy)"
+                        }}>
+                            {grievance.drivers?.full_name} · {grievance.drivers?.mobile}
                         </div>
-                        {grievance.status !== "resolved" ? (
-                            <button className="btn sm jade"
-                                    onClick={markResolved}>{en ? "Mark Resolved" : "Markahan"}</button>
-                        ) : (
-                            <span className="pill approved">{en ? "Resolved" : "Nalutas"}</span>
-                        )}
+                        <div style={{
+                            fontSize: 12,
+                            color: "var(--slate)",
+                            marginTop: 2
+                        }}>📋 {programName} · {grievance.concern_type}</div>
                     </div>
-                </div>
-
-                <div style={{display: "flex", flexDirection: "column", gap: 12, marginBottom: 16}}>
-                    {thread.map(m => {
-                        const isDriver = m.sent_by === "driver"
-                        return (
-                            <div key={m.id} style={{alignSelf: isDriver ? "flex-start" : "flex-end", maxWidth: "85%"}}>
-                                <div style={{
-                                    background: isDriver ? "var(--cream)" : "var(--navy)",
-                                    border: isDriver ? "1px solid var(--border)" : "none",
-                                    color: isDriver ? "var(--navy)" : "#fff",
-                                    borderRadius: isDriver ? "14px 14px 14px 4px" : "14px 14px 4px 14px",
-                                    padding: "10px 14px", fontSize: 13, lineHeight: 1.6
-                                }}>
-                                    {m.message}
-                                </div>
-                                <div style={{
-                                    fontSize: 10,
-                                    color: "var(--slate)",
-                                    marginTop: 3,
-                                    textAlign: isDriver ? "left" : "right"
-                                }}>
-                                    {isDriver ? (en ? "Driver" : "Driver") : (en ? "You (Admin)" : "Ikaw (Admin)")} · {new Date(m.created_at).toLocaleString("en-PH", {
-                                    month: "short",
-                                    day: "numeric",
-                                    hour: "numeric",
-                                    minute: "2-digit"
-                                })}
-                                </div>
-                            </div>
-                        )
-                    })}
-                    {thread.length > 0 && thread[thread.length - 1].sent_by === "driver" && (
-                        <div style={{fontSize: 12, color: "var(--slate)", fontStyle: "italic"}}>
-                            ⏳ {en ? "Awaiting your response..." : "Naghihintay ng tugon mo..."}
-                        </div>
+                    {grievance.status !== "resolved" ? (
+                        <button className="btn sm jade"
+                                onClick={markResolved}>{en ? "Mark Resolved" : "Markahan"}</button>
+                    ) : (
+                        <span className="pill approved">{en ? "Resolved" : "Nalutas"}</span>
                     )}
                 </div>
+            </div>
 
-                <div style={{display: "flex", gap: 8, alignItems: "flex-end"}}>
+            <div style={{display: "flex", flexDirection: "column", gap: 12, marginBottom: 16}}>
+                {thread.map(m => {
+                    const isDriver = m.sent_by === "driver"
+                    return (
+                        <div key={m.id} style={{alignSelf: isDriver ? "flex-start" : "flex-end", maxWidth: "85%"}}>
+                            <div style={{
+                                background: isDriver ? "var(--cream)" : "var(--navy)",
+                                border: isDriver ? "1px solid var(--border)" : "none",
+                                color: isDriver ? "var(--navy)" : "#fff",
+                                borderRadius: isDriver ? "14px 14px 14px 4px" : "14px 14px 4px 14px",
+                                padding: "10px 14px", fontSize: 13, lineHeight: 1.6
+                            }}>
+                                {m.message}
+                            </div>
+                            <div style={{
+                                fontSize: 10,
+                                color: "var(--slate)",
+                                marginTop: 3,
+                                textAlign: isDriver ? "left" : "right"
+                            }}>
+                                {isDriver ? (en ? "Driver" : "Driver") : (en ? "You (Admin)" : "Ikaw (Admin)")} · {new Date(m.created_at).toLocaleString("en-PH", {
+                                month: "short",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit"
+                            })}
+                            </div>
+                        </div>
+                    )
+                })}
+                {thread.length > 0 && thread[thread.length - 1].sent_by === "driver" && (
+                    <div style={{fontSize: 12, color: "var(--slate)", fontStyle: "italic"}}>
+                        ⏳ {en ? "Awaiting your response..." : "Naghihintay ng tugon mo..."}
+                    </div>
+                )}
+            </div>
+
+            <div style={{display: "flex", gap: 8, alignItems: "flex-end"}}>
                 <textarea
                     className="fta"
                     value={reply}
@@ -6301,14 +6323,14 @@ function EditProfile({ en, driverId, driver, showToast, onDone, showTutorial, se
                     placeholder={en ? "Type your reply..." : "I-type ang iyong tugon..."}
                     style={{minHeight: 60, flex: 1, marginBottom: 0}}
                 />
-                    <button className="btn sm jade" style={{width: "auto", marginBottom: 0, padding: "12px 18px"}}
-                            disabled={saving || !reply.trim()} onClick={sendReply}>
-                        {saving ? "..." : (en ? "Send" : "Ipadala")}
-                    </button>
-                </div>
+                <button className="btn sm jade" style={{width: "auto", marginBottom: 0, padding: "12px 18px"}}
+                        disabled={saving || !reply.trim()} onClick={sendReply}>
+                    {saving ? "..." : (en ? "Send" : "Ipadala")}
+                </button>
             </div>
-        )
-    }
+        </div>
+    )
+}
 
 // ─── ADMIN PANEL (SPLIT-SCREEN VALIDATION MODULE ATTACHED) ───────────────────
 function AdminPanel({ en, showToast }) {
@@ -7085,493 +7107,490 @@ function AdminPanel({ en, showToast }) {
 }
 
 // ─── ROOT CONTAINER ENGINE ───────────────────────────────────────────────────
-    export default function App() {
-        const [lang, setLang] = useState("fil")
-        const [page, setPage] = useState(sessionStorage.getItem("uplift_page") || "signin")
-        const [showTutorial, setShowTutorial] = useState(false)
-        const [helpAppId, setHelpAppId] = useState(null)
-        const [loggedIn, setLoggedIn] = useState(!!sessionStorage.getItem("uplift_session"))
-        const [restoringSession, setRestoringSession] = useState(!!sessionStorage.getItem("uplift_session"))
-        const logoTapCount = useRef(0)
-        const logoTapTimer = useRef(null)
+export default function App() {
+    const [lang, setLang] = useState("fil")
+    const [page, setPage] = useState(sessionStorage.getItem("uplift_page") || "signin")
+    const [showTutorial, setShowTutorial] = useState(false)
+    const [helpAppId, setHelpAppId] = useState(null)
+    const [loggedIn, setLoggedIn] = useState(!!sessionStorage.getItem("uplift_session"))
+    const [restoringSession, setRestoringSession] = useState(!!sessionStorage.getItem("uplift_session"))
+    const logoTapCount = useRef(0)
+    const logoTapTimer = useRef(null)
 
-        function handleLogoTap() {
-            logoTapCount.current += 1
-            if (logoTapTimer.current) clearTimeout(logoTapTimer.current)
-            logoTapTimer.current = setTimeout(() => { logoTapCount.current = 0 }, 5000)
-            if (logoTapCount.current >= 5) {
-                logoTapCount.current = 0
-                navigate("admin")
-                return true
-            }
-            showToast(`${logoTapCount.current}/5`)
-            return false
+    function handleLogoTap() {
+        logoTapCount.current += 1
+        if (logoTapTimer.current) clearTimeout(logoTapTimer.current)
+        logoTapTimer.current = setTimeout(() => { logoTapCount.current = 0 }, 5000)
+        if (logoTapCount.current >= 5) {
+            logoTapCount.current = 0
+            if (loggedIn) navigate("admin")
         }
+    }
 
-        const [driver, setDriver] = useState(null)
-        const [driverId, setDriverId] = useState(null)
-        const [apps, setApps] = useState([])
-        const [appointment, setAppointment] = useState(null)
-        const [allAppointments, setAllAppointments] = useState([])
-        const [openEvents, setOpenEvents] = useState([])
-        const [concerns, setConcerns] = useState([])
-        const [toast, setToast] = useState("")
-        useEffect(() => {
-            const saved = sessionStorage.getItem("uplift_session")
-            const savedPage = sessionStorage.getItem("uplift_page")
-            if (saved) {
-                handleLogin(saved, savedPage || "dashboard").then(() => {
-                    setRestoringSession(false)
-                })
-            } else {
+    const [driver, setDriver] = useState(null)
+    const [driverId, setDriverId] = useState(null)
+    const [apps, setApps] = useState([])
+    const [appointment, setAppointment] = useState(null)
+    const [allAppointments, setAllAppointments] = useState([])
+    const [openEvents, setOpenEvents] = useState([])
+    const [concerns, setConcerns] = useState([])
+    const [toast, setToast] = useState("")
+    useEffect(() => {
+        const saved = sessionStorage.getItem("uplift_session")
+        const savedPage = sessionStorage.getItem("uplift_page")
+        if (saved) {
+            handleLogin(saved, savedPage || "dashboard").then(() => {
                 setRestoringSession(false)
-            }
-        }, [])
-        const [modalQueue, setModalQueue] = useState([])
-        const [currentModal, setCurrentModal] = useState(null)
-        const [sessionNotifShown, setSessionNotifShown] = useState(false)
-        const en = lang === "en"
+            })
+        } else {
+            setRestoringSession(false)
+        }
+    }, [])
+    const [modalQueue, setModalQueue] = useState([])
+    const [currentModal, setCurrentModal] = useState(null)
+    const [sessionNotifShown, setSessionNotifShown] = useState(false)
+    const en = lang === "en"
 
-        function showToast(msg) {
-            setToast(msg);
-            setTimeout(() => setToast(""), 3000)
+    function showToast(msg) {
+        setToast(msg);
+        setTimeout(() => setToast(""), 3000)
+    }
+
+    function buildNotifQueue(driverData, appsData, apptData, eventsData, readIds = []) {
+        const queue = []
+        const now = new Date()
+
+        function isNew(id) {
+            const deadlineTypes = ["deadline_", "new_event_"]
+            if (deadlineTypes.some(prefix => id.startsWith(prefix))) return true
+            return !readIds.includes(id)
         }
 
-        function buildNotifQueue(driverData, appsData, apptData, eventsData, readIds = []) {
-            const queue = []
-            const now = new Date()
+        // Verification status
+        if (driverData.verification_status === "verified") {
+            queue.push({
+                id: "verified",
+                icon: "✅",
+                title: en ? "Account Verified!" : "Na-verify ang Account!",
+                body: en ? "Your identity has been verified. Future subsidy applications will auto-fill from your profile." : "Na-verify na ang iyong pagkakakilanlan. Ang mga susunod na aplikasyon ay awtomatikong mapupunan.",
+                action: null,
+                closeLabel: en ? "Got it" : "Nakuha ko",
+            })
+        } else if (driverData.verification_status === "rejected" && driverData.verification_notes) {
+            queue.push({
+                id: "rejected_verification",
+                icon: "❌",
+                title: en ? "Verification Rejected" : "Tinanggihan ang Verification",
+                body: en ? `Please correct the following fields: ${driverData.verification_notes}` : `Pakitama ang mga sumusunod na field: ${driverData.verification_notes}`,
+                action: "editprofile",
+                actionLabel: en ? "Edit My Information" : "I-edit ang Aking Impormasyon",
+                closeLabel: en ? "Later" : "Mamaya na",
+            })
+        }
 
-            function isNew(id) {
-                const deadlineTypes = ["deadline_", "new_event_"]
-                if (deadlineTypes.some(prefix => id.startsWith(prefix))) return true
-                return !readIds.includes(id)
-            }
-
-            // Verification status
-            if (driverData.verification_status === "verified") {
+        // Application status changes
+        ;(appsData || []).forEach(a => {
+            if (a.status === "approved") {
                 queue.push({
-                    id: "verified",
-                    icon: "✅",
-                    title: en ? "Account Verified!" : "Na-verify ang Account!",
-                    body: en ? "Your identity has been verified. Future subsidy applications will auto-fill from your profile." : "Na-verify na ang iyong pagkakakilanlan. Ang mga susunod na aplikasyon ay awtomatikong mapupunan.",
-                    action: null,
+                    id: `approved_${a.id}`,
+                    icon: "🎉",
+                    title: en ? "Application Approved!" : "Naaprubahan ang Aplikasyon!",
+                    body: en
+                        ? `Your application for ${a.payout_events?.program_name} has been approved. Claim your subsidy at ${a.payout_events?.venue} on ${a.payout_events?.event_date}.`
+                        : `Naaprubahan ang iyong aplikasyon para sa ${a.payout_events?.program_name}. Kunin sa ${a.payout_events?.venue} sa ${a.payout_events?.event_date}.`,
+                    action: {type: "view_subsidy", appId: a.id},
+                    actionLabel: en ? "View Details" : "Tingnan ang Detalye",
                     closeLabel: en ? "Got it" : "Nakuha ko",
                 })
-            } else if (driverData.verification_status === "rejected" && driverData.verification_notes) {
+            } else if (a.status === "rejected" && a.rejection_fields) {
                 queue.push({
-                    id: "rejected_verification",
+                    id: `rejected_app_${a.id}`,
                     icon: "❌",
-                    title: en ? "Verification Rejected" : "Tinanggihan ang Verification",
-                    body: en ? `Please correct the following fields: ${driverData.verification_notes}` : `Pakitama ang mga sumusunod na field: ${driverData.verification_notes}`,
+                    title: en ? "Application Rejected" : "Tinanggihan ang Aplikasyon",
+                    body: en
+                        ? `Your application for ${a.payout_events?.program_name} was rejected. Reason: ${a.rejection_fields}.`
+                        : `Tinanggihan ang aplikasyon para sa ${a.payout_events?.program_name}. Dahilan: ${a.rejection_fields}.`,
                     action: "editprofile",
-                    actionLabel: en ? "Edit My Information" : "I-edit ang Aking Impormasyon",
+                    actionLabel: en ? "Edit My Information" : "I-edit ang Impormasyon",
+                    action2: {type: "view_subsidy", appId: a.id},
+                    action2Label: en ? "View Application" : "Tingnan ang Aplikasyon",
                     closeLabel: en ? "Later" : "Mamaya na",
                 })
             }
+        })
 
-            // Application status changes
-            ;(appsData || []).forEach(a => {
-                if (a.status === "approved") {
-                    queue.push({
-                        id: `approved_${a.id}`,
-                        icon: "🎉",
-                        title: en ? "Application Approved!" : "Naaprubahan ang Aplikasyon!",
-                        body: en
-                            ? `Your application for ${a.payout_events?.program_name} has been approved. Claim your subsidy at ${a.payout_events?.venue} on ${a.payout_events?.event_date}.`
-                            : `Naaprubahan ang iyong aplikasyon para sa ${a.payout_events?.program_name}. Kunin sa ${a.payout_events?.venue} sa ${a.payout_events?.event_date}.`,
-                        action: {type: "view_subsidy", appId: a.id},
-                        actionLabel: en ? "View Details" : "Tingnan ang Detalye",
-                        closeLabel: en ? "Got it" : "Nakuha ko",
-                    })
-                } else if (a.status === "rejected" && a.rejection_fields) {
-                    queue.push({
-                        id: `rejected_app_${a.id}`,
-                        icon: "❌",
-                        title: en ? "Application Rejected" : "Tinanggihan ang Aplikasyon",
-                        body: en
-                            ? `Your application for ${a.payout_events?.program_name} was rejected. Reason: ${a.rejection_fields}.`
-                            : `Tinanggihan ang aplikasyon para sa ${a.payout_events?.program_name}. Dahilan: ${a.rejection_fields}.`,
-                        action: "editprofile",
-                        actionLabel: en ? "Edit My Information" : "I-edit ang Impormasyon",
-                        action2: {type: "view_subsidy", appId: a.id},
-                        action2Label: en ? "View Application" : "Tingnan ang Aplikasyon",
-                        closeLabel: en ? "Later" : "Mamaya na",
-                    })
-                }
-            })
-
-            // Deadline warnings
-            const existingEventIds = (appsData || []).map(a => a.event_id)
-            ;(eventsData || []).forEach(ev => {
-                if (!ev.application_deadline) return
-                if (existingEventIds.includes(ev.id)) return
-                const deadline = new Date(ev.application_deadline)
-                const hoursLeft = (deadline - now) / (1000 * 60 * 60)
-                if (hoursLeft < 0) return
-                if (hoursLeft <= 48) {
-                    const isToday = hoursLeft <= 24
-                    queue.push({
-                        id: `deadline_${ev.id}`,
-                        icon: isToday ? "🔴" : "🟡",
-                        title: isToday
-                            ? (en ? "Deadline is TODAY!" : "Deadline Ngayon!")
-                            : (en ? "Deadline Tomorrow!" : "Deadline Bukas!"),
-                        body: en
-                            ? `Applications for ${ev.program_name} close on ${deadline.toLocaleString("en-PH", {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "2-digit"
-                            })}. Don't miss it!`
-                            : `Magsasara ang mga aplikasyon para sa ${ev.program_name} sa ${deadline.toLocaleString("en-PH", {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "2-digit"
-                            })}. Huwag palampasin!`,
-                        action: {type: "apply", eventId: ev.id},
-                        actionLabel: en ? "Apply Now" : "Mag-apply Na",
-                        closeLabel: en ? "Later" : "Mamaya na",
-                    })
-                }
-            })
-
-            // New events
-            ;(eventsData || []).forEach(ev => {
-                if (existingEventIds.includes(ev.id)) return
-                if (!ev.application_deadline || new Date(ev.application_deadline) < now) return
-                const publishedRecently = ev.announcement_date
-                    ? (now - new Date(ev.announcement_date)) / (1000 * 60 * 60 * 24) <= 3
-                    : (now - new Date(ev.created_at || now)) / (1000 * 60 * 60 * 24) <= 3
-                if (publishedRecently) {
-                    queue.push({
-                        id: `new_event_${ev.id}`,
-                        icon: "📢",
-                        title: en ? "New Subsidy Available!" : "Bagong Subsidy!",
-                        body: en
-                            ? `${ev.program_name} (${ev.program_amount}) is now open for applications. Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "2-digit"
-                            })}.`
-                            : `Bukas na ang ${ev.program_name} (${ev.program_amount}) para sa mga aplikasyon. Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
-                                month: "short",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "2-digit"
-                            })}.`,
-                        action: {type: "apply", eventId: ev.id},
-                        actionLabel: en ? "Apply Now" : "Mag-apply Na",
-                        closeLabel: en ? "Maybe Later" : "Mamaya Na Lang",
-                    })
-                }
-            })
-
-            return queue.filter(n => isNew(n.id))
-        }
-
-        const [applyEventId, setApplyEventId] = useState(null)
-        const [subsidyAppId, setSubsidyAppId] = useState(null)
-
-        function navigate(targetPage, contextId) {
-            setShowTutorial(false)
-            if (targetPage === "helpcenter") setHelpAppId(contextId || null)
-            if (targetPage === "apply") setApplyEventId(contextId || null)
-            if (targetPage === "subsidies") setSubsidyAppId(contextId || null)
-            sessionStorage.setItem("uplift_page", targetPage)
-            setPage(targetPage)
-        }
-
-        async function loadDriverData(id, triggerModals = false, readIds = []) {
-            const [{data: profile}, {data: appsData}, {data: apptData}, {data: eventsData}] = await Promise.all([
-                supabase.from("drivers").select("*").eq("id", id).single(),
-                supabase.from("applications").select("*, payout_events(*), application_messages(id, message, created_at, sent_by)").eq("driver_id", id).order("applied_at", {ascending: false}),
-                supabase.from("appointments").select("*, payout_events(program_name, venue, event_date, time_start, time_end)").eq("driver_id", id).eq("status", "confirmed"),
-                supabase.from("payout_events").select("*").order("event_date", {ascending: true}),
-            ])
-            if (profile) {
-                setDriver({
-                    name: profile.full_name.split(" ")[0],
-                    verification_status: profile.verification_status,
-                    verification_notes: profile.verification_notes,
-                    license_url: profile.license_url,
-                    last_name: profile.last_name, first_name: profile.first_name,
-                    middle_name: profile.middle_name, extension_name: profile.extension_name,
-                    region: profile.region, province: profile.province,
-                    city: profile.city, barangay: profile.barangay,
-                    birth_month: profile.birth_month, birth_day: profile.birth_day,
-                    birth_year: profile.birth_year, age: profile.age, sex: profile.sex,
-                    denomination: profile.denomination, case_number: profile.case_number,
-                    operator_name: profile.operator_name, plate_number: profile.plate_number,
-                    chassis_number: profile.chassis_number, license_number: profile.license_number,
-                    ewallet_type: profile.ewallet_type, ewallet_number: profile.ewallet_number,
+        // Deadline warnings
+        const existingEventIds = (appsData || []).map(a => a.event_id)
+        ;(eventsData || []).forEach(ev => {
+            if (!ev.application_deadline) return
+            if (existingEventIds.includes(ev.id)) return
+            const deadline = new Date(ev.application_deadline)
+            const hoursLeft = (deadline - now) / (1000 * 60 * 60)
+            if (hoursLeft < 0) return
+            if (hoursLeft <= 48) {
+                const isToday = hoursLeft <= 24
+                queue.push({
+                    id: `deadline_${ev.id}`,
+                    icon: isToday ? "🔴" : "🟡",
+                    title: isToday
+                        ? (en ? "Deadline is TODAY!" : "Deadline Ngayon!")
+                        : (en ? "Deadline Tomorrow!" : "Deadline Bukas!"),
+                    body: en
+                        ? `Applications for ${ev.program_name} close on ${deadline.toLocaleString("en-PH", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit"
+                        })}. Don't miss it!`
+                        : `Magsasara ang mga aplikasyon para sa ${ev.program_name} sa ${deadline.toLocaleString("en-PH", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit"
+                        })}. Huwag palampasin!`,
+                    action: {type: "apply", eventId: ev.id},
+                    actionLabel: en ? "Apply Now" : "Mag-apply Na",
+                    closeLabel: en ? "Later" : "Mamaya na",
                 })
             }
-            setApps(appsData || [])
-            setAllAppointments(apptData || [])
-            setAppointment(apptData?.[0] || null)
-            setOpenEvents(eventsData || [])
-            const {data: concernsData} = await supabase
-                .from("grievances")
-                .select("*, applications(payout_events(program_name)), grievance_messages(id, message, sent_by, created_at)")
-                .eq("driver_id", id)
-                .order("created_at", {ascending: false})
-            setConcerns(concernsData || [])
-            if (triggerModals && profile) {
-                const queue = buildNotifQueue(profile, appsData || [], apptData, eventsData || [], readIds)
-                if (queue.length > 0) {
-                    setModalQueue(queue.slice(1))
-                    setCurrentModal(queue[0])
-                }
+        })
+
+        // New events
+        ;(eventsData || []).forEach(ev => {
+            if (existingEventIds.includes(ev.id)) return
+            if (!ev.application_deadline || new Date(ev.application_deadline) < now) return
+            const publishedRecently = ev.announcement_date
+                ? (now - new Date(ev.announcement_date)) / (1000 * 60 * 60 * 24) <= 3
+                : (now - new Date(ev.created_at || now)) / (1000 * 60 * 60 * 24) <= 3
+            if (publishedRecently) {
+                queue.push({
+                    id: `new_event_${ev.id}`,
+                    icon: "📢",
+                    title: en ? "New Subsidy Available!" : "Bagong Subsidy!",
+                    body: en
+                        ? `${ev.program_name} (${ev.program_amount}) is now open for applications. Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit"
+                        })}.`
+                        : `Bukas na ang ${ev.program_name} (${ev.program_amount}) para sa mga aplikasyon. Deadline: ${new Date(ev.application_deadline).toLocaleString("en-PH", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit"
+                        })}.`,
+                    action: {type: "apply", eventId: ev.id},
+                    actionLabel: en ? "Apply Now" : "Mag-apply Na",
+                    closeLabel: en ? "Maybe Later" : "Mamaya Na Lang",
+                })
+            }
+        })
+
+        return queue.filter(n => isNew(n.id))
+    }
+
+    const [applyEventId, setApplyEventId] = useState(null)
+    const [subsidyAppId, setSubsidyAppId] = useState(null)
+
+    function navigate(targetPage, contextId) {
+        setShowTutorial(false)
+        if (targetPage === "helpcenter") setHelpAppId(contextId || null)
+        if (targetPage === "apply") setApplyEventId(contextId || null)
+        if (targetPage === "subsidies") setSubsidyAppId(contextId || null)
+        sessionStorage.setItem("uplift_page", targetPage)
+        setPage(targetPage)
+    }
+
+    async function loadDriverData(id, triggerModals = false, readIds = []) {
+        const [{data: profile}, {data: appsData}, {data: apptData}, {data: eventsData}] = await Promise.all([
+            supabase.from("drivers").select("*").eq("id", id).single(),
+            supabase.from("applications").select("*, payout_events(*), application_messages(id, message, created_at, sent_by)").eq("driver_id", id).order("applied_at", {ascending: false}),
+            supabase.from("appointments").select("*, payout_events(program_name, venue, event_date, time_start, time_end)").eq("driver_id", id).eq("status", "confirmed"),
+            supabase.from("payout_events").select("*").order("event_date", {ascending: true}),
+        ])
+        if (profile) {
+            setDriver({
+                name: profile.full_name.split(" ")[0],
+                verification_status: profile.verification_status,
+                verification_notes: profile.verification_notes,
+                license_url: profile.license_url,
+                last_name: profile.last_name, first_name: profile.first_name,
+                middle_name: profile.middle_name, extension_name: profile.extension_name,
+                region: profile.region, province: profile.province,
+                city: profile.city, barangay: profile.barangay,
+                birth_month: profile.birth_month, birth_day: profile.birth_day,
+                birth_year: profile.birth_year, age: profile.age, sex: profile.sex,
+                denomination: profile.denomination, case_number: profile.case_number,
+                operator_name: profile.operator_name, plate_number: profile.plate_number,
+                chassis_number: profile.chassis_number, license_number: profile.license_number,
+                ewallet_type: profile.ewallet_type, ewallet_number: profile.ewallet_number,
+            })
+        }
+        setApps(appsData || [])
+        setAllAppointments(apptData || [])
+        setAppointment(apptData?.[0] || null)
+        setOpenEvents(eventsData || [])
+        const {data: concernsData} = await supabase
+            .from("grievances")
+            .select("*, applications(payout_events(program_name)), grievance_messages(id, message, sent_by, created_at)")
+            .eq("driver_id", id)
+            .order("created_at", {ascending: false})
+        setConcerns(concernsData || [])
+        if (triggerModals && profile) {
+            const queue = buildNotifQueue(profile, appsData || [], apptData, eventsData || [], readIds)
+            if (queue.length > 0) {
+                setModalQueue(queue.slice(1))
+                setCurrentModal(queue[0])
             }
         }
+    }
 
-        async function handleLogin(mobileNum, returnPage = "dashboard") {
-            const {data} = await supabase.from("drivers").select("*").eq("mobile", mobileNum).single()
-            if (data) {
-                setShowTutorial(false)
-                setDriverId(data.id)
-                sessionStorage.setItem("uplift_session", mobileNum)
-                const {data: reads} = await supabase
-                    .from("notification_reads")
-                    .select("notification_id")
-                    .eq("driver_id", data.id)
-                const readIds = (reads || []).map(r => r.notification_id)
-                await loadDriverData(data.id, false, readIds)
-                setLoggedIn(true)
-                setPage(returnPage)
+    async function handleLogin(mobileNum, returnPage = "dashboard") {
+        const {data} = await supabase.from("drivers").select("*").eq("mobile", mobileNum).single()
+        if (data) {
+            setShowTutorial(false)
+            setDriverId(data.id)
+            sessionStorage.setItem("uplift_session", mobileNum)
+            const {data: reads} = await supabase
+                .from("notification_reads")
+                .select("notification_id")
+                .eq("driver_id", data.id)
+            const readIds = (reads || []).map(r => r.notification_id)
+            await loadDriverData(data.id, false, readIds)
+            setLoggedIn(true)
+            setPage(returnPage)
+        }
+    }
+
+    async function handleUploadDocument(files) {
+        if (!driverId || !files || files.length === 0) return
+        showToast(en ? "Uploading documents..." : "Ina-upload ang mga dokumento...")
+        const urls = []
+        for (const file of files) {
+            const ext = file.name.split(".").pop()
+            const filename = `${driverId}_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+            const {error: uploadError} = await supabase.storage
+                .from("licenses")
+                .upload(filename, file, {contentType: file.type, upsert: true})
+            if (!uploadError) {
+                const {data: urlData} = supabase.storage.from("licenses").getPublicUrl(filename)
+                urls.push(urlData.publicUrl)
             }
         }
-
-        async function handleUploadDocument(files) {
-            if (!driverId || !files || files.length === 0) return
-            showToast(en ? "Uploading documents..." : "Ina-upload ang mga dokumento...")
-            const urls = []
-            for (const file of files) {
-                const ext = file.name.split(".").pop()
-                const filename = `${driverId}_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
-                const {error: uploadError} = await supabase.storage
-                    .from("licenses")
-                    .upload(filename, file, {contentType: file.type, upsert: true})
-                if (!uploadError) {
-                    const {data: urlData} = supabase.storage.from("licenses").getPublicUrl(filename)
-                    urls.push(urlData.publicUrl)
-                }
-            }
-            if (urls.length > 0) {
-                const imageExtensions = [".jpg", ".jpeg", ".png"]
-                const firstImageUrl = urls.find(u => imageExtensions.some(ext => u.toLowerCase().endsWith(ext))) || urls[0]
-                await supabase.from("drivers").update({
-                    license_url: firstImageUrl,
-                    document_urls: urls.join(","),
-                    verification_status: "unverified"
-                }).eq("id", driverId)
-                showToast(en ? `${urls.length} document(s) submitted for verification.` : `${urls.length} dokumento ang naisumite para sa verification.`)
-                await loadDriverData(driverId)
-            } else {
-                showToast(en ? "Upload failed. Please try again." : "Hindi na-upload. Subukan muli.")
-            }
+        if (urls.length > 0) {
+            const imageExtensions = [".jpg", ".jpeg", ".png"]
+            const firstImageUrl = urls.find(u => imageExtensions.some(ext => u.toLowerCase().endsWith(ext))) || urls[0]
+            await supabase.from("drivers").update({
+                license_url: firstImageUrl,
+                document_urls: urls.join(","),
+                verification_status: "unverified"
+            }).eq("id", driverId)
+            showToast(en ? `${urls.length} document(s) submitted for verification.` : `${urls.length} dokumento ang naisumite para sa verification.`)
+            await loadDriverData(driverId)
+        } else {
+            showToast(en ? "Upload failed. Please try again." : "Hindi na-upload. Subukan muli.")
         }
+    }
 
-        function handleLogout() {
-            sessionStorage.removeItem("uplift_session")
-            sessionStorage.removeItem("uplift_page")
-            sessionStorage.removeItem("uplift_draft_message")
-            sessionStorage.removeItem("uplift_draft_id")
-            sessionStorage.removeItem("uplift_draft_appid")
-            sessionStorage.removeItem("uplift_draft_type")
-            sessionStorage.removeItem("uplift_draft_show")
-            setLoggedIn(false);
-            setDriver(null);
-            setDriverId(null);
-            setApps([]);
-            setAppointment(null);
-            setOpenEvents([]);
-            setConcerns([]);
-            setPage("signin")
-        }
+    function handleLogout() {
+        sessionStorage.removeItem("uplift_session")
+        sessionStorage.removeItem("uplift_page")
+        sessionStorage.removeItem("uplift_draft_message")
+        sessionStorage.removeItem("uplift_draft_id")
+        sessionStorage.removeItem("uplift_draft_appid")
+        sessionStorage.removeItem("uplift_draft_type")
+        sessionStorage.removeItem("uplift_draft_show")
+        setLoggedIn(false);
+        setDriver(null);
+        setDriverId(null);
+        setApps([]);
+        setAppointment(null);
+        setOpenEvents([]);
+        setConcerns([]);
+        setPage("signin")
+    }
 
-        async function refreshApps() {
-            if (!driverId) return
-            const {data} = await supabase
-                .from("applications")
-                .select("*, payout_events(*), application_messages(id, message, created_at, sent_by)")
-                .eq("driver_id", driverId)
-                .order("applied_at", {ascending: false})
-            if (data) setApps(data)
-        }
+    async function refreshApps() {
+        if (!driverId) return
+        const {data} = await supabase
+            .from("applications")
+            .select("*, payout_events(*), application_messages(id, message, created_at, sent_by)")
+            .eq("driver_id", driverId)
+            .order("applied_at", {ascending: false})
+        if (data) setApps(data)
+    }
 
-        async function refreshConcerns() {
-            if (!driverId) return
-            const {data} = await supabase
-                .from("grievances")
-                .select("*, applications(payout_events(program_name)), grievance_messages(id, message, sent_by, created_at)")
-                .eq("driver_id", driverId)
-                .order("created_at", {ascending: false})
-            setConcerns(data || [])
-        }
+    async function refreshConcerns() {
+        if (!driverId) return
+        const {data} = await supabase
+            .from("grievances")
+            .select("*, applications(payout_events(program_name)), grievance_messages(id, message, sent_by, created_at)")
+            .eq("driver_id", driverId)
+            .order("created_at", {ascending: false})
+        setConcerns(data || [])
+    }
 
-        async function closeModal() {
-            if (currentModal?.id && driverId) {
-                const deadlineTypes = ["deadline_", "new_event_"]
-                const isDeadline = deadlineTypes.some(prefix => currentModal.id.startsWith(prefix))
-                if (!isDeadline) {
-                    await supabase.from("notification_reads").upsert({
-                        driver_id: driverId,
-                        notification_id: currentModal.id,
-                    }, {onConflict: "driver_id,notification_id"})
-                }
-            }
-            if (modalQueue.length > 0) {
-                setCurrentModal(modalQueue[0])
-                setModalQueue(prev => prev.slice(1))
-            } else {
-                setCurrentModal(null)
+    async function closeModal() {
+        if (currentModal?.id && driverId) {
+            const deadlineTypes = ["deadline_", "new_event_"]
+            const isDeadline = deadlineTypes.some(prefix => currentModal.id.startsWith(prefix))
+            if (!isDeadline) {
+                await supabase.from("notification_reads").upsert({
+                    driver_id: driverId,
+                    notification_id: currentModal.id,
+                }, {onConflict: "driver_id,notification_id"})
             }
         }
-
-        function handleModalAction(action) {
-            if (!action) return
-            if (typeof action === "string") {
-                navigate(action)
-            } else if (action.type === "apply") {
-                navigate("apply", action.eventId)
-            } else if (action.type === "view_subsidy") {
-                navigate("subsidies", action.appId)
-            }
+        if (modalQueue.length > 0) {
+            setCurrentModal(modalQueue[0])
+            setModalQueue(prev => prev.slice(1))
+        } else {
+            setCurrentModal(null)
         }
+    }
 
-        const navItems = [
-            {key: "dashboard", ico: "🏠", en: "Home", fil: "Home"},
-            {key: "subsidies", ico: "📋", en: "Subsidies", fil: "Subsidies"},
-        ]
+    function handleModalAction(action) {
+        if (!action) return
+        if (typeof action === "string") {
+            navigate(action)
+        } else if (action.type === "apply") {
+            navigate("apply", action.eventId)
+        } else if (action.type === "view_subsidy") {
+            navigate("subsidies", action.appId)
+        }
+    }
 
-        function renderPage() {
-            if (!loggedIn) {
-                if (page === "signup") return <SignUp en={en} onNav={navigate} onLogin={handleLogin}
-                                                      showTutorial={showTutorial} setShowTutorial={setShowTutorial}/>
-                if (page === "changenumber") return <ChangeNumber en={en} onNav={navigate} showTutorial={showTutorial}
-                                                                  setShowTutorial={setShowTutorial}/>
-                if (page === "forgot") return <ForgotPassword en={en} onNav={navigate} showTutorial={showTutorial}
+    const navItems = [
+        {key: "dashboard", ico: "🏠", en: "Home", fil: "Home"},
+        {key: "subsidies", ico: "📋", en: "Subsidies", fil: "Subsidies"},
+    ]
+
+    function renderPage() {
+        if (!loggedIn) {
+            if (page === "signup") return <SignUp en={en} onNav={navigate} onLogin={handleLogin}
+                                                  showTutorial={showTutorial} setShowTutorial={setShowTutorial}/>
+            if (page === "changenumber") return <ChangeNumber en={en} onNav={navigate} showTutorial={showTutorial}
                                                               setShowTutorial={setShowTutorial}/>
-                if (page === "admin") return <AdminPanel en={en} showToast={showToast}/>
-                return <SignIn en={en} onNav={navigate} onLogin={handleLogin} showTutorial={showTutorial}
-                               setShowTutorial={setShowTutorial}/>
-            }
+            if (page === "forgot") return <ForgotPassword en={en} onNav={navigate} showTutorial={showTutorial}
+                                                          setShowTutorial={setShowTutorial}/>
             if (page === "admin") return <AdminPanel en={en} showToast={showToast}/>
-            if (page === "editprofile") return <EditProfile en={en} driverId={driverId} driver={driver}
-                                                            showToast={showToast} onDone={async () => {
-                await loadDriverData(driverId);
-                setPage("dashboard")
-            }} showTutorial={showTutorial} setShowTutorial={setShowTutorial}/>
-            if (page === "subsidies") return <Subsidies en={en} onNav={navigate} apps={apps}
-                                                        allAppointments={allAppointments} driverId={driverId}
-                                                        showToast={showToast} refreshApps={refreshApps}
-                                                        preselectedAppId={subsidyAppId} showTutorial={showTutorial}
-                                                        setShowTutorial={setShowTutorial}/>
-            if (page === "apply") return <Apply en={en} driverId={driverId} driver={driver} showToast={showToast}
-                                                refreshApps={refreshApps} onNav={navigate}
-                                                preselectedEventId={applyEventId} showTutorial={showTutorial}
-                                                setShowTutorial={setShowTutorial}/>
-            if (page === "helpcenter") return <HelpCenter en={en} apps={apps} driverId={driverId} showToast={showToast}
-                                                          onNav={navigate} preselectedAppId={helpAppId}
+            return <SignIn en={en} onNav={navigate} onLogin={handleLogin} showTutorial={showTutorial}
+                           setShowTutorial={setShowTutorial}/>
+        }
+        if (page === "admin") return <AdminPanel en={en} showToast={showToast}/>
+        if (page === "editprofile") return <EditProfile en={en} driverId={driverId} driver={driver}
+                                                        showToast={showToast} onDone={async () => {
+            await loadDriverData(driverId);
+            setPage("dashboard")
+        }} showTutorial={showTutorial} setShowTutorial={setShowTutorial}/>
+        if (page === "subsidies") return <Subsidies en={en} onNav={navigate} apps={apps}
+                                                    allAppointments={allAppointments} driverId={driverId}
+                                                    showToast={showToast} refreshApps={refreshApps}
+                                                    preselectedAppId={subsidyAppId} showTutorial={showTutorial}
+                                                    setShowTutorial={setShowTutorial}/>
+        if (page === "apply") return <Apply en={en} driverId={driverId} driver={driver} showToast={showToast}
+                                            refreshApps={refreshApps} onNav={navigate}
+                                            preselectedEventId={applyEventId} showTutorial={showTutorial}
+                                            setShowTutorial={setShowTutorial}/>
+        if (page === "helpcenter") return <HelpCenter en={en} apps={apps} driverId={driverId} showToast={showToast}
+                                                      onNav={navigate} preselectedAppId={helpAppId}
+                                                      showTutorial={showTutorial}
+                                                      setShowTutorial={setShowTutorial}/>
+        if (page === "myconcerns") return <MyConcernsPage en={en} concerns={concerns} apps={apps}
+                                                          driverId={driverId} showToast={showToast}
+                                                          refreshConcerns={refreshConcerns} onNav={navigate}
                                                           showTutorial={showTutorial}
                                                           setShowTutorial={setShowTutorial}/>
-            if (page === "myconcerns") return <MyConcernsPage en={en} concerns={concerns} apps={apps}
-                                                              driverId={driverId} showToast={showToast}
-                                                              refreshConcerns={refreshConcerns} onNav={navigate}
-                                                              showTutorial={showTutorial}
-                                                              setShowTutorial={setShowTutorial}/>
-            if (page === "notifications") return <Notifications en={en} apps={apps} appointment={appointment}
-                                                                driver={driver} openEvents={openEvents}
-                                                                onOpenModal={(modal) => setCurrentModal(modal)}/>
-            return <Dashboard en={en} onNav={navigate} driver={driver || {name: "Driver"}} apps={apps}
-                              appointment={appointment} onUploadDocument={handleUploadDocument} concerns={concerns}
-                              driverId={driverId} showToast={showToast} openEvents={openEvents}
-                              onOpenModal={(modal) => setCurrentModal(modal)} refreshApps={refreshApps}
-                              refreshConcerns={refreshConcerns} showTutorial={showTutorial}
-                              setShowTutorial={setShowTutorial}/>
-        }
-
-        return (
-            <>
-                <style>{css}</style>
-                <div className={`app ${loggedIn ? 'logged-in-layout' : ''}`}>
-                    <Toast msg={toast}/>
-                    <NotifModal notif={currentModal} onClose={closeModal} onAction={handleModalAction}/>
-
-                    <div className="topbar">
-                        <div className="logo" onClick={() => { if (!handleLogoTap()) setPage(loggedIn ? "dashboard" : "signin") }}>UPLIFT <span>EO 110</span>
-                        </div>
-                        <div className="topbar-right">
-
-                            {/* Light Bulb Tutorial Button */}
-                            <button
-                                className="tbtn ghost"
-                                style={{fontSize: 16, padding: "2px 6px"}}
-                                onClick={() => setShowTutorial(true)}
-                                title={en ? "Open Tutorial" : "Buksan ang Tutorial"}
-                            >
-                                💡
-                            </button>
-
-                            <button className="tbtn lang-btn"
-                                    onClick={() => setLang(l => l === "en" ? "fil" : "en")}>{en ? "Filipino" : "English"}</button>
-                            {loggedIn && <button className="tbtn" style={{background: "var(--brick)", color: "#fff"}}
-                                                 onClick={handleLogout}>{en ? "Sign Out" : "Sign Out"}</button>}
-                        </div>
-                    </div>
-
-                    {loggedIn && (
-                        <div className="sidebar">
-                            {navItems.map(item => (
-                                <button key={item.key} className={`sidebar-item ${page === item.key ? "active" : ""}`}
-                                        onClick={() => navigate(item.key)}>
-                                    <span className="sico">{item.ico}</span>
-                                    <span>{en ? item.en : item.fil}</span>
-                                </button>
-                            ))}
-                            {/*<button className="sidebar-item" onClick={() => setPage("admin")}>*/}
-                            {/*    <span className="sico">⚙️</span><span>Admin Desk</span>*/}
-                            {/*</button>*/}
-                        </div>
-                    )}
-
-                    <div className={loggedIn ? "main-content" : ""}>
-                        <div className={loggedIn ? "scroll" : "scroll no-nav"}>
-                            <div className={loggedIn ? "page-inner" : ""}>
-                                {restoringSession ? (
-                                    <div style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        height: "100vh"
-                                    }}>
-                                        <div style={{
-                                            fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                            color: "var(--navy)",
-                                            fontSize: 14
-                                        }}>Loading...
-                                        </div>
-                                    </div>
-                                ) : renderPage()}
-                            </div>
-                        </div>
-                    </div>
-
-                    {loggedIn && (
-                        <nav className="bnav">
-                            {navItems.map(item => (
-                                <button key={item.key} className={`bnav-item ${page === item.key ? "active" : ""}`}
-                                        onClick={() => navigate(item.key)}>
-                                    <span className="ico">{item.ico}</span>
-                                    <span className="lbl">{en ? item.en : item.fil}</span>
-                                </button>
-                            ))}
-                        </nav>
-                    )}
-                </div>
-            </>
-        )
+        if (page === "notifications") return <Notifications en={en} apps={apps} appointment={appointment}
+                                                            driver={driver} openEvents={openEvents}
+                                                            onOpenModal={(modal) => setCurrentModal(modal)}/>
+        return <Dashboard en={en} onNav={navigate} driver={driver || {name: "Driver"}} apps={apps}
+                          appointment={appointment} onUploadDocument={handleUploadDocument} concerns={concerns}
+                          driverId={driverId} showToast={showToast} openEvents={openEvents}
+                          onOpenModal={(modal) => setCurrentModal(modal)} refreshApps={refreshApps}
+                          refreshConcerns={refreshConcerns} showTutorial={showTutorial}
+                          setShowTutorial={setShowTutorial}/>
     }
+
+    return (
+        <>
+            <style>{css}</style>
+            <div className={`app ${loggedIn ? 'logged-in-layout' : ''}`}>
+                <Toast msg={toast}/>
+                <NotifModal notif={currentModal} onClose={closeModal} onAction={handleModalAction}/>
+
+                <div className="topbar">
+                    <div className="logo" onClick={() => { handleLogoTap(); setPage(loggedIn ? "dashboard" : "signin") }}>UPLIFT <span>EO 110</span>
+                    </div>
+                    <div className="topbar-right">
+
+                        {/* Light Bulb Tutorial Button */}
+                        <button
+                            className="tbtn ghost"
+                            style={{fontSize: 16, padding: "2px 6px"}}
+                            onClick={() => setShowTutorial(true)}
+                            title={en ? "Open Tutorial" : "Buksan ang Tutorial"}
+                        >
+                            💡
+                        </button>
+
+                        <button className="tbtn lang-btn"
+                                onClick={() => setLang(l => l === "en" ? "fil" : "en")}>{en ? "Filipino" : "English"}</button>
+                        {loggedIn && <button className="tbtn" style={{background: "var(--brick)", color: "#fff"}}
+                                             onClick={handleLogout}>{en ? "Sign Out" : "Sign Out"}</button>}
+                    </div>
+                </div>
+
+                {loggedIn && (
+                    <div className="sidebar">
+                        {navItems.map(item => (
+                            <button key={item.key} className={`sidebar-item ${page === item.key ? "active" : ""}`}
+                                    onClick={() => navigate(item.key)}>
+                                <span className="sico">{item.ico}</span>
+                                <span>{en ? item.en : item.fil}</span>
+                            </button>
+                        ))}
+                        {/*<button className="sidebar-item" onClick={() => setPage("admin")}>*/}
+                        {/*    <span className="sico">⚙️</span><span>Admin Desk</span>*/}
+                        {/*</button>*/}
+                    </div>
+                )}
+
+                <div className={loggedIn ? "main-content" : ""}>
+                    <div className={loggedIn ? "scroll" : "scroll no-nav"}>
+                        <div className={loggedIn ? "page-inner" : ""}>
+                            {restoringSession ? (
+                                <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: "100vh"
+                                }}>
+                                    <div style={{
+                                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                        color: "var(--navy)",
+                                        fontSize: 14
+                                    }}>Loading...
+                                    </div>
+                                </div>
+                            ) : renderPage()}
+                        </div>
+                    </div>
+                </div>
+
+                {loggedIn && (
+                    <nav className="bnav">
+                        {navItems.map(item => (
+                            <button key={item.key} className={`bnav-item ${page === item.key ? "active" : ""}`}
+                                    onClick={() => navigate(item.key)}>
+                                <span className="ico">{item.ico}</span>
+                                <span className="lbl">{en ? item.en : item.fil}</span>
+                            </button>
+                        ))}
+                    </nav>
+                )}
+            </div>
+        </>
+    )
+}
