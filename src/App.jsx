@@ -2258,8 +2258,7 @@ function SignUp({ en, onNav, onLogin, showTutorial, setShowTutorial }) {
     )
 }
 
-function ConcernsInline({ en, concerns, apps, driverId, showToast, refreshConcerns, showTutorial, tutStep, getHighlightStyle, GuideBox }) {
-    const [openThreadId, setOpenThreadId] = useState(null)
+function ConcernsInline({ en, concerns, apps, driverId, showToast, refreshConcerns, showTutorial, tutStep, getHighlightStyle, GuideBox, onOpenThread }) {
     // const [expandedSub, setExpandedSub] = useState(null)
     useEffect(() => {
         if (sessionStorage.getItem("uplift_draft_show") === "true") {
@@ -2273,8 +2272,6 @@ function ConcernsInline({ en, concerns, apps, driverId, showToast, refreshConcer
         }, 10000)
         return () => clearInterval(interval)
     }, [])
-    const [draftMessages, setDraftMessages] = useState({})
-    const [draftTimers, setDraftTimers] = useState({})
     const [newConcernAppId, setNewConcernAppId] = useState(sessionStorage.getItem("uplift_draft_appid") || null)
     const [newConcernType, setNewConcernType] = useState(sessionStorage.getItem("uplift_draft_type") || "")
     const [newConcernMessage, setNewConcernMessage] = useState(sessionStorage.getItem("uplift_draft_message") || "")
@@ -2304,49 +2301,6 @@ function ConcernsInline({ en, concerns, apps, driverId, showToast, refreshConcer
             await supabase.from("grievances").update({ driver_seen_reply: true }).eq("id", concern.id)
             await refreshConcerns()
         }
-    }
-
-    const [followUpText, setFollowUpText] = useState("")
-    const [sendingFollowUp, setSendingFollowUp] = useState(false)
-
-    async function sendFollowUp(concern) {
-        if (!followUpText.trim()) return
-        setSendingFollowUp(true)
-        await supabase.from("grievance_messages").insert({
-            grievance_id: concern.id,
-            message: followUpText,
-            sent_by: "driver",
-        })
-        setFollowUpText("")
-        setSendingFollowUp(false)
-        await refreshConcerns()
-    }
-
-    function handleDraftChange(concernId, value) {
-        setDraftMessages(p => ({ ...p, [concernId]: value }))
-        if (draftTimers[concernId]) clearTimeout(draftTimers[concernId])
-        const timer = setTimeout(async () => {
-            if (!value.trim()) {
-                await supabase.from("grievances").delete().eq("id", concernId)
-                setOpenThreadId(null)
-                await refreshConcerns()
-                return
-            }
-            await supabase.from("grievances").update({ draft_message: value }).eq("id", concernId)
-        }, 1500)
-        setDraftTimers(p => ({ ...p, [concernId]: timer }))
-    }
-
-    async function submitConcern(concern) {
-        const message = draftMessages[concern.id] ?? concern.draft_message
-        if (!message?.trim()) return
-        await supabase.from("grievances").update({
-            message: message,
-            is_draft: false,
-            status: "submitted",
-        }).eq("id", concern.id)
-        showToast(en ? "Concern submitted." : "Naisumite ang alalahanin.")
-        await refreshConcerns()
     }
 
     const [autoSaveTimer, setAutoSaveTimer] = useState(null)
@@ -2459,106 +2413,6 @@ function ConcernsInline({ en, concerns, apps, driverId, showToast, refreshConcer
         )
     }
 
-    // ── Chat-thread screen for a single concern ──
-    const openThread = openThreadId ? concerns.find(c => c.id === openThreadId) : null
-    if (openThread) {
-        const isDraft = openThread.is_draft || openThread.status === "draft"
-        const programName = openThread.applications?.payout_events?.program_name || (en ? "General Concern" : "Pangkalahatang Alalahanin")
-        const thread = getThreadMessages(openThread)
-        return (
-            <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                    <span className="link" onClick={() => { setOpenThreadId(null); setFollowUpText("") }}>← {en ? "Back to My Concerns" : "Bumalik sa Aking mga Alalahanin"}</span>
-                </div>
-                <div className="card" style={{ marginBottom: 12 }}>
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: "var(--navy)" }}>
-                        📋 {programName}
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-                        <div style={{ fontSize: 12, color: "var(--slate)" }}>{openThread.concern_type}</div>
-                        {openThread.is_grievance && (
-                            <span style={{ background: "var(--brick-bg)", color: "var(--brick)", borderRadius: 20, padding: "1px 8px", fontSize: 10, fontWeight: 700 }}>
-                                ⚑ {en ? "Grievance" : "Reklamo"}
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
-                    {thread.length === 0 && !isDraft && (
-                        <div style={{ fontSize: 12, color: "var(--slate)", fontStyle: "italic" }}>
-                            {en ? "No messages yet." : "Wala pang mensahe."}
-                        </div>
-                    )}
-                    {thread.map(m => {
-                        const isDriver = m.sent_by === "driver"
-                        return (
-                            <div key={m.id} style={{ alignSelf: isDriver ? "flex-end" : "flex-start", maxWidth: "85%" }}>
-                                <div style={{
-                                    background: isDriver ? "var(--navy)" : "var(--jade-bg)",
-                                    border: isDriver ? "none" : "1px solid var(--jade)",
-                                    color: isDriver ? "#fff" : "var(--navy)",
-                                    borderRadius: isDriver ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-                                    padding: "10px 14px", fontSize: 13, lineHeight: 1.6
-                                }}>
-                                    {m.message}
-                                </div>
-                                <div style={{ fontSize: 10, color: "var(--slate)", marginTop: 3, textAlign: isDriver ? "right" : "left" }}>
-                                    {isDriver ? (en ? "You" : "Ikaw") : `🏛️ ${en ? "Agency" : "Ahensya"}`} · {new Date(m.created_at).toLocaleString("en-PH", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
-                                </div>
-                            </div>
-                        )
-                    })}
-                    {!isDraft && thread.length > 0 && thread[thread.length - 1].sent_by === "driver" && (
-                        <div style={{ alignSelf: "flex-start", maxWidth: "85%" }}>
-                            <div style={{ background: "var(--cream)", border: "1px solid var(--border)", color: "var(--slate)", borderRadius: "14px 14px 14px 4px", padding: "10px 14px", fontSize: 12, fontStyle: "italic" }}>
-                                ⏳ {en ? "Waiting for the agency to respond..." : "Naghihintay ng tugon mula sa ahensya..."}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Draft compose — only shown before the first submission */}
-                {isDraft && (
-                    <div className="card">
-                        <div style={{ fontSize: 12, color: "var(--amber)", fontWeight: 600, marginBottom: 8 }}>
-                            📝 {en ? "This concern hasn't been sent yet. Finish writing it and submit when ready." : "Hindi pa naipapadala ito. Tapusin ang pagsulat at isumite kapag handa na."}
-                        </div>
-                        <textarea
-                            className="fta"
-                            value={draftMessages[openThread.id] ?? openThread.draft_message ?? ""}
-                            onChange={e => handleDraftChange(openThread.id, e.target.value)}
-                            placeholder={en ? "Your concern..." : "Ang iyong alalahanin..."}
-                            style={{ minHeight: 90, marginBottom: 8 }}
-                        />
-                        <div style={{ fontSize: 11, color: "var(--slate)", marginBottom: 8 }}>
-                            💾 {en ? "Auto-saving as you type..." : "Awtomatikong nini-save habang nagta-type..."}
-                        </div>
-                        <button className="btn navy" style={{ marginBottom: 0 }} onClick={() => submitConcern(openThread)}>
-                            {en ? "Send" : "Ipadala"}
-                        </button>
-                    </div>
-                )}
-
-                {/* Follow-up composer — always available once the concern has been sent */}
-                {!isDraft && (
-                    <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                        <textarea
-                            className="fta"
-                            value={followUpText}
-                            onChange={e => setFollowUpText(e.target.value)}
-                            placeholder={en ? "Write a follow-up message..." : "Magsulat ng follow-up na mensahe..."}
-                            style={{ minHeight: 44, flex: 1, marginBottom: 0 }}
-                        />
-                        <button className="btn navy sm" style={{ width: "auto", marginBottom: 0, padding: "12px 18px" }} disabled={sendingFollowUp || !followUpText.trim()} onClick={() => sendFollowUp(openThread)}>
-                            {sendingFollowUp ? "..." : (en ? "Send" : "Ipadala")}
-                        </button>
-                    </div>
-                )}
-            </div>
-        )
-    }
-
     return (
         <div>
             {Object.keys(grouped).length === 0 && !showNewForm && (
@@ -2574,7 +2428,7 @@ function ConcernsInline({ en, concerns, apps, driverId, showToast, refreshConcer
                         className="card"
                         style={{ marginBottom: 8, cursor: "pointer" }}
                         onClick={async () => {
-                            setOpenThreadId(c.id)
+                            onOpenThread(c.id)
                             await markSeen(c)
                         }}
                     >
@@ -2660,7 +2514,164 @@ function ConcernsInline({ en, concerns, apps, driverId, showToast, refreshConcer
     )
 }
 
+// ── Chat-thread screen for a single concern — deliberately has NO tutorial props at all,
+// so the guided tour can never appear here regardless of what's happening elsewhere. ──
+function ConcernThreadView({ en, concern, showToast, refreshConcerns, onBack }) {
+    const [draftMessage, setDraftMessage] = useState(concern.draft_message || "")
+    const [draftTimer, setDraftTimer] = useState(null)
+    const [followUpText, setFollowUpText] = useState("")
+    const [sendingFollowUp, setSendingFollowUp] = useState(false)
+
+    function getThreadMessages(c) {
+        const msgs = c.is_draft || c.status === "draft" ? [] : [
+            { id: `opening-${c.id}`, message: c.message, sent_by: "driver", created_at: c.created_at }
+        ]
+        const extra = (c.grievance_messages || []).slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        return [...msgs, ...extra]
+    }
+
+    function handleDraftChange(value) {
+        setDraftMessage(value)
+        if (draftTimer) clearTimeout(draftTimer)
+        const timer = setTimeout(async () => {
+            if (!value.trim()) {
+                await supabase.from("grievances").delete().eq("id", concern.id)
+                onBack()
+                await refreshConcerns()
+                return
+            }
+            await supabase.from("grievances").update({ draft_message: value }).eq("id", concern.id)
+        }, 1500)
+        setDraftTimer(timer)
+    }
+
+    async function submitConcern() {
+        const message = draftMessage ?? concern.draft_message
+        if (!message?.trim()) return
+        await supabase.from("grievances").update({
+            message: message,
+            is_draft: false,
+            status: "submitted",
+        }).eq("id", concern.id)
+        showToast(en ? "Concern submitted." : "Naisumite ang alalahanin.")
+        await refreshConcerns()
+    }
+
+    async function sendFollowUp() {
+        if (!followUpText.trim()) return
+        setSendingFollowUp(true)
+        await supabase.from("grievance_messages").insert({
+            grievance_id: concern.id,
+            message: followUpText,
+            sent_by: "driver",
+        })
+        setFollowUpText("")
+        setSendingFollowUp(false)
+        await refreshConcerns()
+    }
+
+    const isDraft = concern.is_draft || concern.status === "draft"
+    const programName = concern.applications?.payout_events?.program_name || (en ? "General Concern" : "Pangkalahatang Alalahanin")
+    const thread = getThreadMessages(concern)
+
+    return (
+        <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                <span className="link" onClick={() => { onBack(); setFollowUpText("") }}>← {en ? "Back to My Concerns" : "Bumalik sa Aking mga Alalahanin"}</span>
+            </div>
+            <div className="card" style={{ marginBottom: 12 }}>
+                <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: "var(--navy)" }}>
+                    📋 {programName}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "var(--slate)" }}>{concern.concern_type}</div>
+                    {concern.is_grievance && (
+                        <span style={{ background: "var(--brick-bg)", color: "var(--brick)", borderRadius: 20, padding: "1px 8px", fontSize: 10, fontWeight: 700 }}>
+                            ⚑ {en ? "Grievance" : "Reklamo"}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+                {thread.length === 0 && !isDraft && (
+                    <div style={{ fontSize: 12, color: "var(--slate)", fontStyle: "italic" }}>
+                        {en ? "No messages yet." : "Wala pang mensahe."}
+                    </div>
+                )}
+                {thread.map(m => {
+                    const isDriver = m.sent_by === "driver"
+                    return (
+                        <div key={m.id} style={{ alignSelf: isDriver ? "flex-end" : "flex-start", maxWidth: "85%" }}>
+                            <div style={{
+                                background: isDriver ? "var(--navy)" : "var(--jade-bg)",
+                                border: isDriver ? "none" : "1px solid var(--jade)",
+                                color: isDriver ? "#fff" : "var(--navy)",
+                                borderRadius: isDriver ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
+                                padding: "10px 14px", fontSize: 13, lineHeight: 1.6
+                            }}>
+                                {m.message}
+                            </div>
+                            <div style={{ fontSize: 10, color: "var(--slate)", marginTop: 3, textAlign: isDriver ? "right" : "left" }}>
+                                {isDriver ? (en ? "You" : "Ikaw") : `🏛️ ${en ? "Agency" : "Ahensya"}`} · {new Date(m.created_at).toLocaleString("en-PH", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                            </div>
+                        </div>
+                    )
+                })}
+                {!isDraft && thread.length > 0 && thread[thread.length - 1].sent_by === "driver" && (
+                    <div style={{ alignSelf: "flex-start", maxWidth: "85%" }}>
+                        <div style={{ background: "var(--cream)", border: "1px solid var(--border)", color: "var(--slate)", borderRadius: "14px 14px 14px 4px", padding: "10px 14px", fontSize: 12, fontStyle: "italic" }}>
+                            ⏳ {en ? "Waiting for the agency to respond..." : "Naghihintay ng tugon mula sa ahensya..."}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Draft compose — only shown before the first submission */}
+            {isDraft && (
+                <div className="card">
+                    <div style={{ fontSize: 12, color: "var(--amber)", fontWeight: 600, marginBottom: 8 }}>
+                        📝 {en ? "This concern hasn't been sent yet. Finish writing it and submit when ready." : "Hindi pa naipapadala ito. Tapusin ang pagsulat at isumite kapag handa na."}
+                    </div>
+                    <textarea
+                        className="fta"
+                        value={draftMessage ?? concern.draft_message ?? ""}
+                        onChange={e => handleDraftChange(e.target.value)}
+                        placeholder={en ? "Your concern..." : "Ang iyong alalahanin..."}
+                        style={{ minHeight: 90, marginBottom: 8 }}
+                    />
+                    <div style={{ fontSize: 11, color: "var(--slate)", marginBottom: 8 }}>
+                        💾 {en ? "Auto-saving as you type..." : "Awtomatikong nini-save habang nagta-type..."}
+                    </div>
+                    <button className="btn navy" style={{ marginBottom: 0 }} onClick={submitConcern}>
+                        {en ? "Send" : "Ipadala"}
+                    </button>
+                </div>
+            )}
+
+            {/* Follow-up composer — always available once the concern has been sent */}
+            {!isDraft && (
+                <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+                    <textarea
+                        className="fta"
+                        value={followUpText}
+                        onChange={e => setFollowUpText(e.target.value)}
+                        placeholder={en ? "Write a follow-up message..." : "Magsulat ng follow-up na mensahe..."}
+                        style={{ minHeight: 44, flex: 1, marginBottom: 0 }}
+                    />
+                    <button className="btn navy sm" style={{ width: "auto", marginBottom: 0, padding: "12px 18px" }} disabled={sendingFollowUp || !followUpText.trim()} onClick={sendFollowUp}>
+                        {sendingFollowUp ? "..." : (en ? "Send" : "Ipadala")}
+                    </button>
+                </div>
+            )}
+        </div>
+    )
+}
+
 function MyConcernsPage({ en, concerns, apps, driverId, showToast, refreshConcerns, onNav, showTutorial, setShowTutorial }) {
+    const [openThreadId, setOpenThreadId] = useState(null)
+    const openThread = openThreadId ? concerns.find(c => c.id === openThreadId) : null
+
     // --- TUTORIAL LOGIC ---
     const [tutStep, setTutStep] = useState(0)
 
@@ -2752,6 +2763,24 @@ function MyConcernsPage({ en, concerns, apps, driverId, showToast, refreshConcer
     }
     // ----------------------
 
+    // A specific concern is open — render ONLY the conversation view. No backdrop, no highlight,
+    // no GuideBox exist anywhere in this branch, so the tutorial structurally cannot appear here.
+    if (openThread) {
+        return (
+            <div>
+                <div className="ph">
+                    <h1>{en ? "My Concerns" : "Aking mga Alalahanin"}</h1>
+                    <p>{en ? "All your concerns and grievances in one place" : "Lahat ng iyong mga alalahanin sa iisang lugar"}</p>
+                </div>
+                <div className="pad">
+                    <span className="link" onClick={() => onNav("dashboard")}>← {en ? "Back to Home" : "Bumalik sa Home"}</span>
+                    <div className="spacer" />
+                    <ConcernThreadView en={en} concern={openThread} showToast={showToast} refreshConcerns={refreshConcerns} onBack={() => setOpenThreadId(null)} />
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div>
             {/* ── TUTORIAL BACKDROP (spotlight effect only — guide text renders inline below each section) ── */}
@@ -2772,7 +2801,7 @@ function MyConcernsPage({ en, concerns, apps, driverId, showToast, refreshConcer
                 <span className="link" onClick={() => onNav("dashboard")}>← {en ? "Back to Home" : "Bumalik sa Home"}</span>
                 <div className="spacer" />
                 <div id="tut-step-1" style={getHighlightStyle(1, 'white')}>
-                    <ConcernsInline en={en} concerns={concerns} apps={apps} driverId={driverId} showToast={showToast} refreshConcerns={refreshConcerns} showTutorial={showTutorial} tutStep={tutStep} getHighlightStyle={getHighlightStyle} GuideBox={GuideBox} />
+                    <ConcernsInline en={en} concerns={concerns} apps={apps} driverId={driverId} showToast={showToast} refreshConcerns={refreshConcerns} showTutorial={showTutorial} tutStep={tutStep} getHighlightStyle={getHighlightStyle} GuideBox={GuideBox} onOpenThread={setOpenThreadId} />
                 </div>
                 <GuideBox stepIndex={1} />
             </div>
